@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "GramRozgar",
-    "slug": "GramRozgar",
+    "name": "GramRozgaar",
+    "slug": "GramRozgaar",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "gramrozgar",
+    "scheme": "gramrozgaar",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
