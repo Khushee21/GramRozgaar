@@ -1,26 +1,25 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const tintColorLight = '#4CAF50'; // Leaf green
+const tintColorDark = '#CDEAC0';  // Soft green glow
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    text: '#2E3A1F',              // Deep earthy text
+    background: '#FAF9F6',        // Soft wheat background
+    tint: tintColorLight,         // Primary button/links
+    icon: '#6D8B5E',              // Muted leaf icon
+    tabIconDefault: '#B6CBA3',
     tabIconSelected: tintColorLight,
+    card: '#E7F2DA',              // Optional: for cards
+    border: '#D0E4BC',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    text: '#F0F7EC',              // Light green-white text
+    background: '#1B2B19',        // Deep soil green
+    tint: tintColorDark,          // Soft green highlight
+    icon: '#A2BBA5',
+    tabIconDefault: '#A2BBA5',
     tabIconSelected: tintColorDark,
+    card: '#2D4030',              // Optional: card background
+    border: '#3D5540',
   },
 };
