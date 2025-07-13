@@ -19,7 +19,7 @@ const Header = () => {
     return (
         <View style={[style.container, { backgroundColor }]}>
             <Text style={[style.logoText, { color: textColor }]}>
-                GramRozgaar🌱
+                GRAMROZGAAR🌱
             </Text>
             <View style={style.rightSection}>
                 <Pressable onPress={toggleLanguage} style={style.iconButton}>
@@ -28,7 +28,6 @@ const Header = () => {
                         {language === "en" ? "English" : "हिन्दी"}
                     </Text>
                 </Pressable>
-
                 <MaterialIcons
                     name={theme === "dark" ? "dark-mode" : "light-mode"}
                     size={24}
@@ -36,7 +35,6 @@ const Header = () => {
                     style={{ marginLeft: 20 }}
                 />
             </View>
-
         </View>
     )
 }
