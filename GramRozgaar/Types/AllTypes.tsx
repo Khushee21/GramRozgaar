@@ -1,13 +1,14 @@
 export interface Auth {
-    Village: string;
-    name: string;
-    age: string;
-    WorkType?: string;
-    IsMachineAvailable?: boolean;
-    IsAvailableForWork?: boolean;
-    MachineType?: string;
+    village: string;
+    name?: string;
+    age: number;
+    workType?: string;
+    isMachineAvailable?: boolean;
+    isAvailableForWork?: boolean;
+    machineType?: string;
     phoneNumber: string;
-    profileImage: string | null;
+    profileImage?: string | null;
     password: string;
     confirmPassword: string;
+    languagePreference?: 'en' | 'hi';
 }

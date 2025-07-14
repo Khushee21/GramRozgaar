@@ -15,10 +15,18 @@ datasource db {
 }
 
 
-model User{
-  id          Int          @id @default(autoincrement())
-  name        String
-  phoneNo     String       @unique
-  password    String        
-  createdAt   DateTime     @default(now())
+model User {
+  id                  Int       @id @default(autoincrement())
+  phoneNumber         String    @unique
+  password            String
+  age                 Int
+  village             String
+  profileImage        String?
+  name                String?
+  workType            String?
+  isMachineAvailable  Boolean?
+  isAvailableForWork  Boolean?
+  machineType         String?
+  languagePreference  String    @default("en")
+  createdAt           DateTime  @default(now())
 }
