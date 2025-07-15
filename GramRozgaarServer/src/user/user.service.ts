@@ -8,9 +8,9 @@ export class UserService {
 
     //sign up function
     async signup(data: any) {
-        const { phoneNumber, password, confirmPassword } = data;
+        const { phoneNumber, password, confirmPassword, age, profilePhoto } = data;
 
-        if (!password || !phoneNumber || !confirmPassword) {
+        if (!password || !phoneNumber || !confirmPassword || !age || !profilePhoto) {
             throw new NotFoundException('Credentials is required');
         }
 
@@ -26,6 +26,8 @@ export class UserService {
             data: {
                 ...data,
                 password: hashedPassword,
+                age: age,
+                profilePhoto: profilePhoto,
             },
         });
         return { message: 'Signup successful !', user };

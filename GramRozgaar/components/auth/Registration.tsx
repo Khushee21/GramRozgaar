@@ -1,23 +1,26 @@
 'use client';
 
 import { useState } from "react";
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, } from "react-native";
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from "react-native";
+import * as ImagePicker from 'expo-image-picker';
+import { API_URL } from "@/services/API";
 import { Auth } from "@/Types/AllTypes";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AuthScreen = () => {
     const [isSignUp, setIsSignUp] = useState(true);
 
     const [formData, setFormData] = useState<Auth>({
         name: '',
-        Village: '',
-        age: '',
+        village: '',
+        age: 0,
         phoneNumber: '',
         password: '',
         confirmPassword: '',
-        WorkType: '',
-        IsAvailableForWork: false,
-        IsMachineAvailable: false,
-        MachineType: '',
+        workType: '',
+        isMachineAvailable: false,
+        isAvailableForWork: false,
+        machineType: '',
         profileImage: ''
     });
 
@@ -25,9 +28,51 @@ const AuthScreen = () => {
         setFormData({ ...formData, [key]: value });
     };
 
-    const handleSubmit = () => {
-        console.log("Submitted Data:", formData);
+    const pickImage = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 1,
+        });
 
+        if (!result.canceled) {
+            const uri = result.assets[0].uri;
+            handleChange("profileImage", uri);
+        }
+    };
+
+    const handleSubmit = async () => {
+        try {
+            if (isSignUp) {
+                const res = await fetch(`${API_URL}/users/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || "Signup failed");
+                Alert.alert("Success", "User registered successfully!");
+                console.log("Signup Success:", data);
+            } else {
+                const res = await fetch(`${API_URL}/users/signin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phoneNumber: formData.phoneNumber,
+                        password: formData.password
+                    }),
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || "Login failed");
+                await AsyncStorage.setItem('user', JSON.stringify(data.user));
+                Alert.alert("Success", "User logged in successfully!");
+                console.log("Login Success:", data);
+            }
+        } catch (err: any) {
+            Alert.alert("Error", err.message);
+        }
     };
 
     return (
@@ -36,6 +81,17 @@ const AuthScreen = () => {
 
             {isSignUp && (
                 <>
+                    <TouchableOpacity style={styles.button} onPress={pickImage}>
+                        <Text style={styles.buttonText}>Choose Profile Image</Text>
+                    </TouchableOpacity>
+
+                    {formData.profileImage ? (
+                        <Image
+                            source={{ uri: formData.profileImage }}
+                            style={{ width: 100, height: 100, borderRadius: 50, alignSelf: 'center', marginBottom: 16 }}
+                        />
+                    ) : null}
+
                     <TextInput
                         style={styles.input}
                         placeholder="Name"
@@ -45,15 +101,15 @@ const AuthScreen = () => {
                     <TextInput
                         style={styles.input}
                         placeholder="Age"
-                        value={formData.age}
+                        value={formData.age.toString()}
                         onChangeText={(text) => handleChange("age", text)}
                         keyboardType="numeric"
                     />
                     <TextInput
                         style={styles.input}
                         placeholder="Village"
-                        value={formData.Village}
-                        onChangeText={(text) => handleChange("Village", text)}
+                        value={formData.village}
+                        onChangeText={(text) => handleChange("village", text)}
                     />
                 </>
             )}

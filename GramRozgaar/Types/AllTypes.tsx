@@ -1,6 +1,6 @@
 export interface Auth {
     village: string;
-    name?: string;
+    name: string;
     age: number;
     workType?: string;
     isMachineAvailable?: boolean;

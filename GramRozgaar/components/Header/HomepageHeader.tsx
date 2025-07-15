@@ -53,7 +53,7 @@ const style = StyleSheet.create({
         borderColor: "#ccc",
     },
     logoText: {
-        fontSize: 29,
+        fontSize: 24,
         fontWeight: "bold",
     },
     rightSection: {
