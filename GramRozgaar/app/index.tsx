@@ -1,5 +1,10 @@
-// index.tsx
-import { registerRootComponent } from 'expo';
-import AppRoot from './AppRoot';
+import HomeScreen from "./home/HomeScreen"
+const Home = () => {
+    return (
+        <>
+            <HomeScreen />
+        </>
+    )
+}
 
-registerRootComponent(AppRoot);
+export default HomeScreen;
