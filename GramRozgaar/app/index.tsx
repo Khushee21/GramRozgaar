@@ -1,16 +1,20 @@
 import { View } from "react-native";
 import LoginRegistration from "./auth/LoginRegistrationScreen";
-import { LanguageProvider } from "@/hooks/useLanguageContext"; // make sure this is correctly defined
+import { LanguageProvider } from "@/hooks/useLanguageContext";
+import { Provider } from "react-redux";
+import { store } from "@/store/store";
 
 export default function Home() {
     return (
-        <LanguageProvider>
-            <View style={{ flex: 1 }}>
-                <LoginRegistration />
-            </View>
-        </LanguageProvider>
+        <Provider store={store}>
+            <LanguageProvider>
+                <View style={{ flex: 1 }}>
+                    <LoginRegistration />
+                </View>
+            </LanguageProvider>
+        </Provider>
     );
-};
+}
 
 export const options = {
     headerShown: false,
