@@ -1,10 +1,12 @@
-import Auth from "@/components/auth/Registration";
-import Header from "@/components/Header/HomepageHeader";
-const LoginRegistrtaion = () => {
-    return (<>
-        <Header />
-        <Auth />
-    </>)
-}
+// ✅ app/auth/LoginRegistration.tsx
+import AuthScreen from "@/components/auth/Registration";
 
-export default LoginRegistrtaion;
+const LoginRegistration = () => {
+    return <AuthScreen />;
+};
+
+export default LoginRegistration;
+
+export const options = {
+    headerShown: false,
+};

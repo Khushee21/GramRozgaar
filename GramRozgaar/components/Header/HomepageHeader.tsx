@@ -19,22 +19,8 @@ const Header = () => {
     return (
         <View style={[style.container, { backgroundColor }]}>
             <Text style={[style.logoText, { color: textColor }]}>
-                GRAMROZGAAR🌱
+                GRAMROZGAAR🌾
             </Text>
-            <View style={style.rightSection}>
-                <Pressable onPress={toggleLanguage} style={style.iconButton}>
-                    <MaterialIcons name="language" size={22} color={textColor} />
-                    <Text style={[style.langText, { color: textColor, marginLeft: 5 }]}>
-                        {language === "en" ? "English" : "हिन्दी"}
-                    </Text>
-                </Pressable>
-                <MaterialIcons
-                    name={theme === "dark" ? "dark-mode" : "light-mode"}
-                    size={24}
-                    color={textColor}
-                    style={{ marginLeft: 20 }}
-                />
-            </View>
         </View>
     )
 }
@@ -42,7 +28,7 @@ export default Header;
 
 const style = StyleSheet.create({
     container: {
-        paddingTop: 90,
+        paddingTop: 120,
         paddingBottom: 15,
         paddingHorizontal: 20,
         flexDirection: "row",
@@ -51,9 +37,10 @@ const style = StyleSheet.create({
         elevation: 4,
         borderBottomWidth: 0.3,
         borderColor: "#ccc",
+        borderRadius: 20,
     },
     logoText: {
-        fontSize: 24,
+        fontSize: 29,
         fontWeight: "bold",
     },
     rightSection: {

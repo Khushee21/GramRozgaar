@@ -22,11 +22,7 @@ const userSlice = createSlice({
             state.phoneNumber = action.payload.phoneNumber;
             state.token = action.payload.token;
         },
-        clearUser: (state) => {
-            state.name = ' ';
-            state.phoneNumber = ' ';
-            state.token = undefined;
-        },
+        clearUser: () => initialState,
     },
 });
 
