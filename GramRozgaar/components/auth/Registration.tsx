@@ -96,7 +96,7 @@ const AuthScreen = () => {
                 if (!res.ok) throw new Error(data.message || 'Signup failed');
                 showSuccess(true);
                 dispatch(setUser(data.user));
-                Alert.alert('सफलता', 'पंजीकरण सफल रहा!');
+                // Alert.alert('सफलता', 'पंजीकरण सफल रहा!');
             } else {
                 const res = await fetch(`${API_URL}/users/signin`, {
                     method: 'POST',
@@ -110,7 +110,8 @@ const AuthScreen = () => {
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.message || 'Login failed');
                 await AsyncStorage.setItem('user', JSON.stringify(data.user));
-                Alert.alert('सफलता', 'लॉगिन सफल रहा!');
+                // Alert.alert('सफलता', 'लॉगिन सफल रहा!');
+                showSuccess(true);
             }
         } catch (err: any) {
             Alert.alert('त्रुटि', err.message);
