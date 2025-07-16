@@ -1,12 +1,19 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { PrismaService } from './prisma/prisma.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly prisma: PrismaService) { }
+
+  @Get('test-prisma')
+  async testPrisma() {
+    const users = await this.prisma.user.findMany();
+    console.log('✅ Users:', users);
+    return { message: 'Prisma is working', users };
+  }
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getRoot(): string {
+    return 'Root path working!';
   }
 }

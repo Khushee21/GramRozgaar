@@ -9,7 +9,7 @@ export default function RootLayout() {
     <Provider store={store}>
       <LanguageProvider>
         <SafeAreaProvider>
-          <Slot /> {/* This renders current route like /auth/LoginRegistrationScreen */}
+          <Slot />
         </SafeAreaProvider>
       </LanguageProvider>
     </Provider>

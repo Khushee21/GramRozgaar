@@ -1,6 +1,11 @@
 import { IsString, IsNotEmpty, IsPhoneNumber, IsOptional, IsInt, Min, Max, isString } from 'class-validator';
 
 export class CreateUserDto {
+
+    @IsNotEmpty()
+    @IsString()
+    name: string;
+
     @IsString()
     @IsNotEmpty()
     village: string;
@@ -24,7 +29,4 @@ export class CreateUserDto {
     @IsOptional()
     @IsString()
     profileImage?: string;
-
-    @IsOptional()
-    languagePrefrence?: 'en' | 'hi';
 }
