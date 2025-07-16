@@ -1,37 +1,62 @@
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import * as bcrypt from 'bcrypt';
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) {
     }
 
     //sign up function
     async signup(data: any) {
-        const { phoneNumber, password, confirmPassword, age, profilePhoto } = data;
+        try {
+            const { village, phoneNumber, password, confirmPassword, age, profileImage, name } = data;
 
-        if (!password || !phoneNumber || !confirmPassword || !age || !profilePhoto) {
-            throw new NotFoundException('Credentials is required');
+            console.log('🛠 Incoming signup data:', data);
+
+            if (!village || !password || !phoneNumber || !confirmPassword || !age || !profileImage || !name) {
+                console.log('❌ Missing field(s)', { village, phoneNumber, password, confirmPassword, age, profileImage, name });
+                throw new NotFoundException('Credentials are required');
+            }
+
+            const existingUser = await this.prisma.user.findUnique({ where: { phoneNumber } });
+            if (existingUser) {
+                console.log('⚠️ User already exists');
+                throw new BadRequestException('User already exists!');
+            }
+
+            if (password !== confirmPassword) {
+                console.log('❌ Passwords do not match');
+                throw new BadRequestException('Passwords do not match.');
+            }
+            console.log('again signup data:', data);
+            const hashedPassword = await bcrypt.hash(password, 10);
+            let user;
+            try {
+                user = await this.prisma.user.create({
+                    data: {
+                        name,
+                        village,
+                        phoneNumber,
+                        password: hashedPassword,
+                        age: Number(age),
+                        profileImage,
+                    },
+                });
+                console.log('✅ User created:', user);
+            } catch (err) {
+                console.error('❌ Prisma create failed:', err);
+                throw new BadRequestException('Database error: ' + err.message);
+            }
+            console.log('✅ User created:', user);
+            return { message: 'Signup successful!', user };
+        } catch (err) {
+            console.error('❌ Error in signup:', err);
+            throw err;
         }
-
-        const existingUser = await this.prisma.user.findUnique({ where: { phoneNumber } });
-        if (existingUser) {
-            throw new BadRequestException('User already exists!');
-        }
-
-        if (password != confirmPassword) throw new BadRequestException('Password do not match.');
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await this.prisma.user.create({
-            data: {
-                ...data,
-                password: hashedPassword,
-                age: age,
-                profilePhoto: profilePhoto,
-            },
-        });
-        return { message: 'Signup successful !', user };
     }
+
 
     //sign in function
     async signin(phoneNumber: string, password: string) {

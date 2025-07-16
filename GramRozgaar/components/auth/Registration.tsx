@@ -41,7 +41,7 @@ const AuthScreen = () => {
     });
 
     const dispatch = useDispatch();
-    const handleChange = (key: keyof Auth, value: string | boolean) => {
+    const handleChange = (key: keyof Auth, value: string | boolean | number) => {
         setFormData({ ...formData, [key]: value });
     };
 
@@ -69,13 +69,30 @@ const AuthScreen = () => {
                     return;
                 }
 
+                const form = new FormData();
+                form.append('name', formData.name);
+                form.append('village', formData.village);
+                form.append('age', String(formData.age));
+                form.append('phoneNumber', formData.phoneNumber);
+                form.append('password', formData.password);
+                form.append('confirmPassword', formData.confirmPassword);
+
+                if (formData.profileImage) {
+                    form.append('profileImage', {
+                        uri: formData.profileImage,
+                        name: 'profile.jpg',
+                        type: 'image/jpeg',
+                    } as any);
+                }
+                console.log(formData.name, formData.village, formData.age, formData.phoneNumber, formData.password, formData.confirmPassword);
                 const res = await fetch(`${API_URL}/users/signup`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData),
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                    body: form,
                 });
 
                 const data = await res.json();
+                console.log('Sign up response', data);
                 if (!res.ok) throw new Error(data.message || 'Signup failed');
                 showSuccess(true);
                 dispatch(setUser(data.user));
@@ -126,9 +143,13 @@ const AuthScreen = () => {
                     <TextInput
                         style={styles.input}
                         placeholder="आयु"
-                        value={formData.age.toString()}
-                        onChangeText={(text) => handleChange('age', text)}
-                        keyboardType="numeric"
+                        value={formData.age ? formData.age.toString() : ''}
+                        onChangeText={(text) => {
+                            const parsed = parseInt(text);
+                            if (!isNaN(parsed)) handleChange('age', parsed);
+                            else handleChange('age', 0);
+                        }}
+                        keyboardType='numeric'
                     />
                     <TextInput
                         style={styles.input}
