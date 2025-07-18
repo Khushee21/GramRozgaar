@@ -49,6 +49,7 @@ export class UserController {
     @Post('signin')
     async signin(@Body() loginUser: LoginUserDto) {
         const { phoneNumber, password } = loginUser;
+        console.log(phoneNumber, password);
         return this.userService.signin(phoneNumber, password);
     }
 }

@@ -61,11 +61,12 @@ export class UserService {
     //sign in function
     async signin(phoneNumber: string, password: string) {
         const user = await this.prisma.user.findUnique({ where: { phoneNumber } });
-
+        console.log(user);
         if (!user) {
             throw new NotFoundException('User not Found, Please enter correct credentials!');
         }
         const match = await bcrypt.compare(password, user.password);
+        console.log(match);
         if (!match) throw new BadRequestException('Password do not match!');
 
         return { message: 'Login successful!', user };
