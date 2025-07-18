@@ -42,7 +42,9 @@ export class UserController {
             success: true,
             message: result.message,
             user: result.user,
+            tokens: result.tokens,
         };
+
     }
 
 

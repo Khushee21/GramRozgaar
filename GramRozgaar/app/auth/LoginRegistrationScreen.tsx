@@ -1,4 +1,4 @@
-// ✅ app/auth/LoginRegistration.tsx
+
 import AuthScreen from "@/components/auth/Registration";
 
 const LoginRegistration = () => {

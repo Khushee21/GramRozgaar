@@ -29,4 +29,6 @@ model User {
   machineType         String?
   languagePreference  String    @default("en")
   createdAt           DateTime  @default(now())
+  refreshToken        String?
+
 }

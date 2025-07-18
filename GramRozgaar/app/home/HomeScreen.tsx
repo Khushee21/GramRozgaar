@@ -43,8 +43,6 @@ const HomeScreen = () => {
                     <Text style={styles.buttonText}>Start</Text>
                 </TouchableOpacity>
             </View>
-
-            {/* Bottom Train Animation */}
             <LottieView
                 source={require('@/assets/gif/home2.json')}
                 autoPlay

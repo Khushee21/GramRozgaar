@@ -10,7 +10,6 @@ import {
     TouchableOpacity,
     Alert,
     Image,
-    ImageBackground,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { API_URL } from '@/services/API';
@@ -21,6 +20,8 @@ import { Dimensions } from 'react-native';
 const { width } = Dimensions.get('window');
 import { setUser } from '@/store/UserSlice';
 import { useDispatch } from 'react-redux';
+import { useRouter } from 'expo-router';
+
 
 const AuthScreen = () => {
     const [isSignUp, setIsSignUp] = useState(true);
@@ -44,6 +45,7 @@ const AuthScreen = () => {
     const handleChange = (key: keyof Auth, value: string | boolean | number) => {
         setFormData({ ...formData, [key]: value });
     };
+    const router = useRouter();
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -84,23 +86,37 @@ const AuthScreen = () => {
                         type: 'image/jpeg',
                     } as any);
                 }
-                console.log(formData.name, formData.village, formData.age, formData.phoneNumber, formData.password, formData.confirmPassword);
+
                 const res = await fetch(`${API_URL}/users/signup`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'multipart/form-data' },
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
                     body: form,
                 });
 
                 const data = await res.json();
-                console.log('Sign up response', data);
                 if (!res.ok) throw new Error(data.message || 'Signup failed');
+
+                const { user, tokens } = data;
+
+                await AsyncStorage.setItem('accessToken', tokens.accessToken);
+                await AsyncStorage.setItem('refreshToken', tokens.refreshToken);
+                await AsyncStorage.setItem('user', JSON.stringify(user));
+
+                dispatch(setUser({
+                    ...user,
+                    token: tokens.accessToken,
+                }));
+
+                router.push('/auth/AdditionalInfo');
                 showSuccess(true);
-                dispatch(setUser(data.user));
-                // Alert.alert('सफलता', 'पंजीकरण सफल रहा!');
             } else {
                 const res = await fetch(`${API_URL}/users/signin`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({
                         phoneNumber: formData.phoneNumber,
                         password: formData.password,
@@ -109,8 +125,19 @@ const AuthScreen = () => {
 
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.message || 'Login failed');
-                await AsyncStorage.setItem('user', JSON.stringify(data.user));
-                // Alert.alert('सफलता', 'लॉगिन सफल रहा!');
+
+                const { user, tokens } = data;
+
+                await AsyncStorage.setItem('accessToken', tokens.accessToken);
+                await AsyncStorage.setItem('refreshToken', tokens.refreshToken);
+                await AsyncStorage.setItem('user', JSON.stringify(user));
+
+                dispatch(setUser({
+                    ...user,
+                    token: tokens.accessToken,
+                }));
+
+                router.push('/auth/AdditionalInfo');
                 showSuccess(true);
             }
         } catch (err: any) {
