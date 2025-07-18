@@ -15,16 +15,17 @@ import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/store/Seletor";
 import LottieView from "lottie-react-native";
 import { LinearGradient } from 'expo-linear-gradient';
+import { Auth } from "@/Types/AllTypes";
+import { API_URL } from "@/services/API";
 
 const { width } = Dimensions.get('window');
 
 const Info = () => {
-    const [village, setVillage] = useState("");
-    const [age, setAge] = useState("");
-    const [isAvailableForWork, setAvailableForWork] = useState(false);
-    const [work, setWork] = useState("");
-    const [isMachineAvailable, setIsMachineAvailable] = useState(false);
-    const [machine, SetMachine] = useState("");
+
+    const [isAvailableForWork, setAvailableForWork] = useState<boolean>(false);
+    const [work, setWork] = useState<string>("");
+    const [isMachineAvailable, setIsMachineAvailable] = useState<boolean>(false);
+    const [machine, SetMachine] = useState<string>("");
     const [machineImages, setMachineImages] = useState<string[]>([]);
 
     const user = useSelector(selectCurrentUser);
@@ -42,11 +43,41 @@ const Info = () => {
             setMachineImages((prev) => [...prev, ...selected]);
         }
     };
+    const handleSubmit = async () => {
+        const formData = new FormData();
+        formData.append('isAvailableForWork', String(isAvailableForWork));
+        formData.append('isMachineAvailable', String(isMachineAvailable));
+        formData.append('workType', work);
+        formData.append('machineType', machine);
 
-    const handleSubmit = () => {
+        machineImages.forEach((uri, index) => {
+            const filename = uri.split('/').pop();
+            const match = /\.(\w+)$/.exec(filename ?? '');
+            const type = match ? `image/${match[1]}` : `image`;
+
+            formData.append('machineImage', {
+                uri,
+                name: filename,
+                type,
+            } as any);
+        });
+        const token = user?.token;
+        try {
+            const res = await fetch(`${API_URL}/users/userInfo`, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            const result = await res.json();
+            console.log(result);
+        } catch (err: any) {
+            console.log('Submission error', err);
+        }
+
         console.log("Submit info:", {
-            village,
-            age,
             isAvailableForWork,
             work,
             isMachineAvailable,
@@ -126,7 +157,7 @@ const Info = () => {
             <TouchableOpacity
                 style={styles.skipButton}
                 onPress={() => {
-                    console.log("जानकारी स्किप की गई");
+                    console.log("Skipped!");
                 }}
             >
                 <Text style={styles.skipText}>छोड़ें</Text>

@@ -5,6 +5,7 @@ import { LoginUserDto } from "./dto/login-user.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from 'multer';
 import { BadRequestException } from "@nestjs/common";
+import { UserInfoDto } from "./dto/user-info.dto";
 
 @Controller('users')
 export class UserController {
@@ -34,7 +35,6 @@ export class UserController {
 
         createUserDto.profileImage = file?.filename;
         const result = await this.userService.signup(createUserDto);
-        // console.log('📦 Returned from service:', result);
         if (!result || !result.user) {
             throw new BadRequestException('Something went wrong');
         }
@@ -51,7 +51,39 @@ export class UserController {
     @Post('signin')
     async signin(@Body() loginUser: LoginUserDto) {
         const { phoneNumber, password } = loginUser;
-        console.log(phoneNumber, password);
         return this.userService.signin(phoneNumber, password);
     }
+
+    @Post('userInfo')
+    @UseInterceptors(FileInterceptor('machineImage', {
+        storage: diskStorage({
+            destination: './uploads/machineImg',
+            filename: (req, file, cb) => {
+                const uniqueName = Date.now() + '-' + file.originalname;
+                cb(null, uniqueName);
+            }
+        })
+    }))
+    async userInfo(
+        @UploadedFile() file: Express.Multer.File,
+        @Body() userInfoDto: UserInfoDto
+    ) {
+        if (!userInfoDto) {
+            throw new BadRequestException('user data has not provided');
+        }
+
+        // 🔹 Validate userId
+        if (!userInfoDto.userId) {
+            throw new BadRequestException('userId is missing in body');
+        }
+
+        const userId = userInfoDto.userId;
+        const machineImages = [file.filename]; // if you expect multiple images, change `@UploadedFile` to `@UploadedFiles`
+
+        // You may choose to remove userId from the DTO before passing it
+        const { userId: _, ...restDto } = userInfoDto;
+
+        return this.userService.userInfo(userId, restDto, machineImages);
+    }
+
 }

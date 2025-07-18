@@ -14,21 +14,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id                  Int       @id @default(autoincrement())
-  phoneNumber         String    @unique
-  password            String
-  age                 Int
-  village             String
-  profileImage        String?
-  name                String?
-  workType            String?
-  isMachineAvailable  Boolean?
-  isAvailableForWork  Boolean?
-  machineType         String?
-  languagePreference  String    @default("en")
-  createdAt           DateTime  @default(now())
-  refreshToken        String?
+  id           Int       @id @default(autoincrement())
+  phoneNumber  String    @unique
+  password     String
+  age          Int
+  village      String
+  profileImage String?
+  name         String?
+  createdAt    DateTime  @default(now())
+  refreshToken String?
+  userInfo     UserInfo?
+}
 
+model UserInfo {
+  id                 String   @id @default(uuid())
+  userId             Int      @unique
+  workType           String
+  isAvailableForWork Boolean
+  isMachineAvailable Boolean
+  machineType        String
+  machineImages      String[]
+  createdAt          DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }

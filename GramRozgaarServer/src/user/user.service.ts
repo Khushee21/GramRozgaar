@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { BadRequestException, NotFoundException, InternalServerErrorException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import * as bcrypt from 'bcrypt';
 import { Injectable } from "@nestjs/common";
@@ -15,22 +15,16 @@ export class UserService {
     async signup(data: any) {
         try {
             const { village, phoneNumber, password, confirmPassword, age, profileImage, name } = data;
-
-            // console.log('🛠 Incoming signup data:', data);
-
             if (!village || !password || !phoneNumber || !confirmPassword || !age || !profileImage || !name) {
-                // console.log('❌ Missing field(s)', { village, phoneNumber, password, confirmPassword, age, profileImage, name });
                 throw new NotFoundException('Credentials are required');
             }
 
             const existingUser = await this.prisma.user.findUnique({ where: { phoneNumber } });
             if (existingUser) {
-                //  console.log('⚠️ User already exists');
                 throw new BadRequestException('User already exists!');
             }
 
             if (password !== confirmPassword) {
-                //  console.log('❌ Passwords do not match');
                 throw new BadRequestException('Passwords do not match.');
             }
             console.log('again signup data:', data);
@@ -47,18 +41,14 @@ export class UserService {
                         profileImage,
                     },
                 });
-                //  console.log('✅ User created:', user);
-
                 const token = await this.authService.getTokens(user.id, phoneNumber);
                 await this.authService.updateRefreshToken(user.id, token.refreshToken);
 
                 return { message: 'Signup successful!', user, tokens: token };
             } catch (err) {
-                //  console.error('❌ Prisma create failed:', err);
                 throw new BadRequestException('Database error: ' + err.message);
             }
         } catch (err) {
-            // console.error('❌ Error in signup:', err);
             throw err;
         }
     }
@@ -67,12 +57,10 @@ export class UserService {
     //sign in function
     async signin(phoneNumber: string, password: string) {
         const user = await this.prisma.user.findUnique({ where: { phoneNumber } });
-        //console.log(user);
         if (!user) {
             throw new NotFoundException('User not Found, Please enter correct credentials!');
         }
         const match = await bcrypt.compare(password, user.password);
-        //console.log(match);
         if (!match) throw new BadRequestException('Password do not match!');
 
         const tokens = await this.authService.getTokens(user.id, phoneNumber);
@@ -80,5 +68,36 @@ export class UserService {
         );
 
         return { message: 'Login successful!', user, tokens };
+    }
+
+    //userInfo function
+    async userInfo(userId: string, data: any, machineImages: string[]) {
+        try {
+            const { workType, isMachineAvailable, isAvailableForWork, machineType } = data;
+            if (!workType || !isAvailableForWork || !isMachineAvailable || !machineType) {
+                throw new NotFoundException('User Information is required!');
+            }
+            const info = await this.prisma.userInfo.create({
+                data: {
+                    userId: Number(userId),
+                    workType,
+                    isAvailableForWork: Boolean(isAvailableForWork),
+                    isMachineAvailable: Boolean(isMachineAvailable),
+                    machineType,
+                    machineImages: machineImages,
+
+                }
+            })
+            if (!info) {
+                throw new BadRequestException('error updation user info');
+            }
+            return {
+                message: 'User Info saved successfully',
+                info
+            }
+        }
+        catch (err: any) {
+            throw new InternalServerErrorException(err.message);
+        }
     }
 }

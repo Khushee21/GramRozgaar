@@ -34,10 +34,6 @@ const AuthScreen = () => {
         phoneNumber: '',
         password: '',
         confirmPassword: '',
-        workType: '',
-        isMachineAvailable: false,
-        isAvailableForWork: false,
-        machineType: '',
         profileImage: '',
     });
 
@@ -108,9 +104,8 @@ const AuthScreen = () => {
                     ...user,
                     token: tokens.accessToken,
                 }));
-
-                router.push('/auth/AdditionalInfo');
                 showSuccess(true);
+                router.push('/auth/AdditionalInfo');
             } else {
                 const res = await fetch(`${API_URL}/users/signin`, {
                     method: 'POST',
@@ -137,8 +132,8 @@ const AuthScreen = () => {
                     token: tokens.accessToken,
                 }));
 
-                router.push('/auth/AdditionalInfo');
                 showSuccess(true);
+                router.push('/auth/AdditionalInfo');
             }
         } catch (err: any) {
             Alert.alert('त्रुटि', err.message);
