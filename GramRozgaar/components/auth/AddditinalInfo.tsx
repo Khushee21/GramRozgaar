@@ -22,6 +22,7 @@ import { setLanguage } from "@/store/PreferencesSlice";
 import { translations } from "@/src/constants/translation";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { authFetch } from "@/services/authFetch";
 
 
 const { width } = Dimensions.get('window');
@@ -78,11 +79,10 @@ const Info = () => {
         });
         const token = user?.token;
         try {
-            const res = await fetch(`${API_URL}/users/userInfo`, {
+            const res = await authFetch(`${API_URL}/users/userInfo`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${token}`,
                 },
                 body: formData,
             });

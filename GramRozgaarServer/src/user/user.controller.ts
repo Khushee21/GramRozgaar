@@ -2,12 +2,13 @@ import { Body, Controller, Post, Req, UploadedFile, UseGuards, UseInterceptors }
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from 'multer';
 import { BadRequestException } from "@nestjs/common";
 import { UserInfoDto } from "./dto/user-info.dto";
 import { JwtAuthGuard } from "./strateges/jwt.guard";
 import { RequestWithUser } from "src/types/RequestWithUser";
+
 
 @Controller('users')
 export class UserController {
@@ -56,9 +57,10 @@ export class UserController {
         return this.userService.signin(phoneNumber, password);
     }
 
+
     @UseGuards(JwtAuthGuard)
     @Post('userInfo')
-    @UseInterceptors(FileInterceptor('machineImage', {
+    @UseInterceptors(FilesInterceptor('machineImage', 5, {
         storage: diskStorage({
             destination: './uploads/machineImg',
             filename: (req, file, cb) => {
@@ -68,7 +70,7 @@ export class UserController {
         })
     }))
     async userInfo(
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile() file: Express.Multer.File[],
         @Body() userInfoDto: UserInfoDto,
         @Req() req: RequestWithUser
     ) {
@@ -77,7 +79,7 @@ export class UserController {
         }
 
         const userId = (req.user.sub);
-        const machineImages = file ? [file.filename] : [];
+        const machineImages = file.map((file) => file.filename);
         const result = await this.userService.userInfo(userId, userInfoDto, machineImages);
         return {
             message: result.message,

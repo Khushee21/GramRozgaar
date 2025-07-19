@@ -19,7 +19,7 @@ export default function Navigation() {
     useEffect(() => {
         const checkInfo = async () => {
             if (user?.phoneNumber) {
-                const done = await AsyncStorage.getItem(`infoDone-${user.phoneNumber}`); // ✅ FIXED LINE
+                const done = await AsyncStorage.getItem(`infoDone-${user.phoneNumber}`);
                 setInfoDone(done === 'true');
             } else {
                 setInfoDone(false);
@@ -28,7 +28,6 @@ export default function Navigation() {
         checkInfo();
     }, [user]);
 
-    // Optional: You can show a loading indicator while checking AsyncStorage
     if (infoDone === null && user) return null;
 
     return (
