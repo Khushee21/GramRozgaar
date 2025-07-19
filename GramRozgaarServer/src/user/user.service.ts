@@ -71,12 +71,28 @@ export class UserService {
     }
 
     //userInfo function
-    async userInfo(userId: string, data: any, machineImages: string[]) {
+    async userInfo(userId: number, data: any, machineImages: string[]) {
         try {
             const { workType, isMachineAvailable, isAvailableForWork, machineType } = data;
-            if (!workType || !isAvailableForWork || !isMachineAvailable || !machineType) {
+
+            console.log(workType, isMachineAvailable, isAvailableForWork, machineType);
+
+            if (!workType || typeof isAvailableForWork !== 'boolean' || typeof isMachineAvailable !== 'boolean') {
                 throw new NotFoundException('User Information is required!');
             }
+
+            // if (isMachineAvailable && !machineType) {
+            //     throw new NotFoundException('Machine type is required if machine is available');
+            // }
+
+            const existingInfo = await this.prisma.userInfo.findUnique({
+                where: { userId: Number(userId) }, // userId is a string
+            });
+
+            if (existingInfo && existingInfo.machineAlreadySet) {
+                throw new BadRequestException('User info already set');
+            }
+
             const info = await this.prisma.userInfo.create({
                 data: {
                     userId: Number(userId),
@@ -84,20 +100,19 @@ export class UserService {
                     isAvailableForWork: Boolean(isAvailableForWork),
                     isMachineAvailable: Boolean(isMachineAvailable),
                     machineType,
-                    machineImages: machineImages,
+                    machineImages,
+                },
+            });
 
-                }
-            })
-            if (!info) {
-                throw new BadRequestException('error updation user info');
-            }
+            console.log('User info created:', info);
+
             return {
                 message: 'User Info saved successfully',
-                info
-            }
-        }
-        catch (err: any) {
+                info,
+            };
+        } catch (err: any) {
             throw new InternalServerErrorException(err.message);
         }
     }
+
 }

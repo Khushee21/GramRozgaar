@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     Switch,
     Dimensions,
+    Alert,
 } from "react-native";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -19,6 +20,8 @@ import { Auth } from "@/Types/AllTypes";
 import { API_URL } from "@/services/API";
 import { setLanguage } from "@/store/PreferencesSlice";
 import { translations } from "@/src/constants/translation";
+import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const { width } = Dimensions.get('window');
@@ -35,6 +38,7 @@ const Info = () => {
     const langauge = useSelector(selectCurrentLanguage);
     const dispatch = useDispatch();
     const t = translations[langauge];
+    const router = useRouter();
 
     const toggleLanguage = () => {
         if (!user.phoneNumber) return;
@@ -61,7 +65,6 @@ const Info = () => {
         formData.append('isMachineAvailable', String(isMachineAvailable));
         formData.append('workType', work);
         formData.append('machineType', machine);
-
         machineImages.forEach((uri, index) => {
             const filename = uri.split('/').pop();
             const match = /\.(\w+)$/.exec(filename ?? '');
@@ -76,6 +79,7 @@ const Info = () => {
         const token = user?.token;
         try {
             const res = await fetch(`${API_URL}/users/userInfo`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`,
@@ -83,9 +87,17 @@ const Info = () => {
                 body: formData,
             });
 
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.message || 'Something went wrong');
+            }
             const result = await res.json();
-            console.log(result);
+            await AsyncStorage.setItem(`infoDone-${user.phoneNumber}`, 'true');
+            Alert.alert('User data submitted', result.message);
+            console.log(res);
+            router.push('/dashboard/dashbord');
         } catch (err: any) {
+            Alert.alert('data submission error', err.message);
             console.log('Submission error', err);
         }
 
@@ -179,7 +191,8 @@ const Info = () => {
             <TouchableOpacity
                 style={styles.skipButton}
                 onPress={() => {
-                    console.log("Skipped!");
+                    //console.log("Skipped!");
+                    router.push('/dashboard/dashbord');
                 }}
             >
                 <Text style={styles.skipText}>{t.skip}</Text>

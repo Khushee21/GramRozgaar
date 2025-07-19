@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Post, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
@@ -6,6 +6,8 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from 'multer';
 import { BadRequestException } from "@nestjs/common";
 import { UserInfoDto } from "./dto/user-info.dto";
+import { JwtAuthGuard } from "./strateges/jwt.guard";
+import { RequestWithUser } from "src/types/RequestWithUser";
 
 @Controller('users')
 export class UserController {
@@ -54,6 +56,7 @@ export class UserController {
         return this.userService.signin(phoneNumber, password);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Post('userInfo')
     @UseInterceptors(FileInterceptor('machineImage', {
         storage: diskStorage({
@@ -66,24 +69,22 @@ export class UserController {
     }))
     async userInfo(
         @UploadedFile() file: Express.Multer.File,
-        @Body() userInfoDto: UserInfoDto
+        @Body() userInfoDto: UserInfoDto,
+        @Req() req: RequestWithUser
     ) {
         if (!userInfoDto) {
-            throw new BadRequestException('user data has not provided');
+            throw new BadRequestException('User data has not been provided');
         }
 
-        // 🔹 Validate userId
-        if (!userInfoDto.userId) {
-            throw new BadRequestException('userId is missing in body');
-        }
-
-        const userId = userInfoDto.userId;
-        const machineImages = [file.filename]; // if you expect multiple images, change `@UploadedFile` to `@UploadedFiles`
-
-        // You may choose to remove userId from the DTO before passing it
-        const { userId: _, ...restDto } = userInfoDto;
-
-        return this.userService.userInfo(userId, restDto, machineImages);
+        const userId = (req.user.sub);
+        const machineImages = file ? [file.filename] : [];
+        const result = await this.userService.userInfo(userId, userInfoDto, machineImages);
+        return {
+            message: result.message,
+            info: {
+                ...result.info,
+                userId: result.info.userId.toString(),
+            },
+        };
     }
-
-}
+};

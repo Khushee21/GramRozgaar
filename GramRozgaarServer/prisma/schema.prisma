@@ -16,7 +16,7 @@ datasource db {
 
 model User {
   id           Int       @id @default(autoincrement())
-  phoneNumber  String    @unique
+  phoneNumber  String   @unique
   password     String
   age          Int
   village      String
@@ -28,14 +28,15 @@ model User {
 }
 
 model UserInfo {
-  id                 String   @id @default(uuid())
-  userId             Int      @unique
-  workType           String
-  isAvailableForWork Boolean
-  isMachineAvailable Boolean
-  machineType        String
-  machineImages      String[]
-  createdAt          DateTime @default(now())
+  id                  String   @id @default(uuid())
+  userId              Int   @unique
+  workType            String
+  isAvailableForWork  Boolean
+  isMachineAvailable  Boolean
+  machineType         String?
+  machineImages       String[]
+  createdAt           DateTime @default(now())
+  machineAlreadySet   Boolean  @default(false)
 
   user User @relation(fields: [userId], references: [id])
 }

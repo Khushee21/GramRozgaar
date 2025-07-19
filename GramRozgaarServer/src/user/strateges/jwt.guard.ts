@@ -1,0 +1,28 @@
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { Request } from 'express';
+import * as jwt from 'jsonwebtoken';
+import { UnauthorizedException } from '@nestjs/common';
+
+@Injectable()
+export class JwtAuthGuard implements CanActivate {
+    // constructor(private reflector: Reflector) { }
+
+    canActivate(context: ExecutionContext): boolean {
+        const request = context.switchToHttp().getRequest<Request>();
+        const authHeader = request.headers['authorization'];
+
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            throw new UnauthorizedException('Authorization token not found');
+        }
+
+        const token = authHeader.split(' ')[1];
+        try {
+            const decoded = jwt.verify(token, process.env.AT_SECRET!);
+            request['user'] = decoded;
+            return true;
+        } catch (err) {
+            return false;
+        }
+    }
+}

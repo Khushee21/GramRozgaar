@@ -2,6 +2,7 @@
 export const translations = {
     en: {
         welcome: "नमस्ते",
+        title: "ग्राम रोजगार🌾",
         intro: "कृपया अपने बारे में जानकारी दें",
         availableForWork: "क्या आप काम के लिए उपलब्ध हैं?",
         workType: "आप किस प्रकार का काम करते हैं?",
@@ -17,6 +18,7 @@ export const translations = {
     },
     hi: {
         welcome: "Hello",
+        title: "GRAMROZGAAR🌾",
         intro: "Please provide your information",
         availableForWork: "Are you available for work?",
         workType: "What kind of work do you do?",
