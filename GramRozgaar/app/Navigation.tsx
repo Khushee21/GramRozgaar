@@ -8,7 +8,10 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '@/store/Seletor';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Dashboard from './dashboard/dashbord';
+import Dashboard from './home/dashbord';
+import HomeDashboard from './home/HomeDashboard';
+import Workers from './home/Workers';
+import AllMachines from './home/Machine';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,13 +38,19 @@ export default function Navigation() {
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 {!user ? (
                     <Stack.Screen name="Login" component={LoginRegistrationScreen} />
-                ) : infoDone ? (
-                    <Stack.Screen name="Home" component={HomeScreen} />
-                ) : (
+                ) : !infoDone ? (
                     <Stack.Screen name="Info" component={AdditionalInfo} />
+                ) : (
+                    <>
+                        <Stack.Screen name="Home" component={HomeScreen} />
+                        <Stack.Screen name="Dashboard" component={Dashboard} />
+                        <Stack.Screen name="HomeDashboard" component={HomeDashboard} />
+                        <Stack.Screen name="Workers" component={Workers} />
+                        <Stack.Screen name="Machines" component={AllMachines} />
+                    </>
                 )}
-                <Stack.Screen name="dashboard" component={Dashboard} />
             </Stack.Navigator>
         </NavigationContainer>
     );
+
 }

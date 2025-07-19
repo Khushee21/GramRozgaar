@@ -23,7 +23,6 @@ const HomeScreen = () => {
             <Header />
 
             <View style={styles.container}>
-                {/* Center Animation */}
                 <LottieView
                     source={require('@/assets/gif/home1.json')}
                     autoPlay

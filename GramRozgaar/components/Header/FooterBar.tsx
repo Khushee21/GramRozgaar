@@ -1,24 +1,29 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 
 const { height } = Dimensions.get('window');
 const FooterBar = () => {
+
+    const router = useRouter();
     return (
         <View style={styles.container}>
-            <TouchableOpacity >
+            <TouchableOpacity
+                onPress={() => router.push('/home/Machine')}>
                 <MaterialIcons name="precision-manufacturing" size={28} color="#2E5C4D" />
             </TouchableOpacity>
 
             <TouchableOpacity
-
+                onPress={() => router.push('/home/HomeDashboard')}
                 style={styles.homeIconWrapper}
             >
                 <FontAwesome5 name="home" size={30} color="#fff" />
             </TouchableOpacity>
 
-            <TouchableOpacity >
+            <TouchableOpacity
+                onPress={() => router.push('/home/Workers')} >
                 <MaterialIcons name="engineering" size={28} color="#2E5C4D" />
             </TouchableOpacity>
         </View>
