@@ -8,6 +8,7 @@ import { BadRequestException } from "@nestjs/common";
 import { UserInfoDto } from "./dto/user-info.dto";
 import { JwtAuthGuard } from "./strateges/jwt.guard";
 import { RequestWithUser } from "src/types/RequestWithUser";
+import { UploadedFiles } from "@nestjs/common";
 
 
 @Controller('users')
@@ -70,7 +71,7 @@ export class UserController {
         })
     }))
     async userInfo(
-        @UploadedFile() file: Express.Multer.File[],
+        @UploadedFiles() file: Express.Multer.File[],
         @Body() userInfoDto: UserInfoDto,
         @Req() req: RequestWithUser
     ) {
@@ -78,7 +79,7 @@ export class UserController {
             throw new BadRequestException('User data has not been provided');
         }
 
-        const userId = (req.user.sub);
+        const userId = Number(req.user.sub);
         const machineImages = file.map((file) => file.filename);
         const result = await this.userService.userInfo(userId, userInfoDto, machineImages);
         return {

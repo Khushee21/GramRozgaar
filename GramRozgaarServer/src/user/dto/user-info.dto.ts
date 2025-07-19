@@ -2,8 +2,6 @@ import { IsArray, IsBoolean, IsOptional, IsString } from "class-validator"
 
 export class UserInfoDto {
 
-    @IsString()
-    userId: string;
 
     @IsString()
     workType: string
@@ -18,7 +16,7 @@ export class UserInfoDto {
     machineType: string
 
     @IsOptional()
-    @IsString()
+    @IsString({ each: true })
     @IsArray()
     machineImages: string
 }
