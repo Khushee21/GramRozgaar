@@ -11,12 +11,15 @@ import {
 } from "react-native";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
-import { useSelector } from "react-redux";
-import { selectCurrentUser } from "@/store/Seletor";
+import { useSelector, useDispatch } from "react-redux";
+import { selectCurrentUser, selectCurrentLanguage } from "@/store/Seletor";
 import LottieView from "lottie-react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Auth } from "@/Types/AllTypes";
 import { API_URL } from "@/services/API";
+import { setLanguage } from "@/store/PreferencesSlice";
+import { translations } from "@/src/constants/translation";
+
 
 const { width } = Dimensions.get('window');
 
@@ -29,6 +32,15 @@ const Info = () => {
     const [machineImages, setMachineImages] = useState<string[]>([]);
 
     const user = useSelector(selectCurrentUser);
+    const langauge = useSelector(selectCurrentLanguage);
+    const dispatch = useDispatch();
+    const t = translations[langauge];
+
+    const toggleLanguage = () => {
+        if (!user.phoneNumber) return;
+        const newLang = langauge === 'hi' ? 'en' : 'hi';
+        dispatch(setLanguage({ phoneNumber: user.phoneNumber, language: newLang }));
+    };
 
     const handleImagePick = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -89,13 +101,23 @@ const Info = () => {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <LinearGradient colors={["#2E5C4D", "#68B684"]} style={styles.header}>
-                <Text style={styles.welcome}>नमस्ते, {user?.name} 👋</Text>
+                <Text style={styles.welcome}>{t.welcome}, {user?.name} 👋</Text>
                 <Text style={styles.subheading}>कृपया अपने बारे में जानकारी दें</Text>
             </LinearGradient>
 
+            <View style={styles.languageToggle}>
+                <Text style={styles.label}>
+                    {langauge === "hi" ? "भाषा:" : "Language:"} {langauge === "hi" ? "हिन्दी" : "English"}
+                </Text>
+                <Switch
+                    value={langauge === "en"}
+                    onValueChange={toggleLanguage}
+                />
+            </View>
+
             <View style={styles.formCard}>
                 <View style={styles.toggleContainer}>
-                    <Text style={styles.label}>क्या आप काम के लिए उपलब्ध हैं?</Text>
+                    <Text style={styles.label}>{t.availableForWork}</Text>
                     <Switch
                         value={isAvailableForWork}
                         onValueChange={setAvailableForWork}
@@ -104,7 +126,7 @@ const Info = () => {
 
                 {isAvailableForWork && (
                     <>
-                        <Text style={styles.label}>आप किस प्रकार का काम करते हैं?</Text>
+                        <Text style={styles.label}>{t.workType}</Text>
                         <TextInput
                             placeholder="जैसे: खेती, मजदूरी, ट्रैक्टर चलाना"
                             value={work}
@@ -115,7 +137,7 @@ const Info = () => {
                 )}
 
                 <View style={styles.toggleContainer}>
-                    <Text style={styles.label}>क्या आपके पास कोई मशीन है?</Text>
+                    <Text style={styles.label}>{t.machineAvailable}</Text>
                     <Switch
                         value={isMachineAvailable}
                         onValueChange={setIsMachineAvailable}
@@ -124,7 +146,7 @@ const Info = () => {
 
                 {isMachineAvailable && (
                     <>
-                        <Text style={styles.label}>मशीन का प्रकार</Text>
+                        <Text style={styles.label}>{t.machineType}</Text>
                         <TextInput
                             placeholder="जैसे: ट्रैक्टर, कल्टीवेटर"
                             value={machine}
@@ -132,7 +154,7 @@ const Info = () => {
                             style={styles.input}
                         />
 
-                        <Text style={styles.label}>मशीन की तस्वीरें अपलोड करें</Text>
+                        <Text style={styles.label}>{t.choosePhotos}</Text>
                         <TouchableOpacity onPress={handleImagePick} style={styles.uploadButton}>
                             <Text style={styles.uploadText}>+ तस्वीरें चुनें</Text>
                         </TouchableOpacity>
@@ -150,7 +172,7 @@ const Info = () => {
                 )}
 
                 <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-                    <Text style={styles.buttonText}>🚀 जानकारी भेजें</Text>
+                    <Text style={styles.buttonText}>{t.submit}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -160,7 +182,7 @@ const Info = () => {
                     console.log("Skipped!");
                 }}
             >
-                <Text style={styles.skipText}>छोड़ें</Text>
+                <Text style={styles.skipText}>{t.skip}</Text>
             </TouchableOpacity>
 
             <LottieView
@@ -295,6 +317,13 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         fontSize: 14,
     },
+    languageToggle: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginVertical: 10,
+    },
+
 });
 
 export default Info;
