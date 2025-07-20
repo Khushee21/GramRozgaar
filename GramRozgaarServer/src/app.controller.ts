@@ -5,11 +5,11 @@ import { PrismaService } from './prisma/prisma.service';
 export class AppController {
   constructor(private readonly prisma: PrismaService) { }
 
-  @Get('test-prisma')
+  @Get('all-tables')
   async testPrisma() {
     const users = await this.prisma.user.findMany();
-    console.log('✅ Users:', users);
-    return { message: 'Prisma is working', users };
+    const userInfo = await this.prisma.userInfo.findMany();
+    return { message: 'Prisma is working', users, userInfo };
   }
 
   @Get()
