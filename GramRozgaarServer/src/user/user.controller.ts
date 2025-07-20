@@ -91,11 +91,18 @@ export class UserController {
         };
     }
 
+    //get user profile
     @Get('user-profile')
     async userProfile(
-        // @Query('userId') userId: number,
         @Query('phoneNumber') phoneNumber: string
     ) {
         return this.userService.userProfile(phoneNumber);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('user-info')
+    async getUserInfo(@Req() req: RequestWithUser) {
+        const userId = Number(req.user.sub);
+        return this.userService.getUserInfo(userId);
     }
 };

@@ -139,4 +139,12 @@ export class UserService {
             throw new Error('Failed to fetch user profile');
         }
     }
+
+    //get user - info
+    async getUserInfo(userId: number) {
+        const userInfo = await this.prisma.userInfo.findMany({
+            where: { userId },
+        });
+        return userInfo;
+    }
 }

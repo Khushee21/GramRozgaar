@@ -53,7 +53,7 @@ const Header = () => {
         <LinearGradient colors={["#2E5C4D", "#68B684"]} style={styles.header}>
             <View style={styles.headerContent}>
                 <Text style={styles.title}>{t.title}</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push('/auth/Profile')}>
                     {profileIcon ? (
                         <Image source={{ uri: profileIcon }} style={styles.icon} />
                     ) : (
