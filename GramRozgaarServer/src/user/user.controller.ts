@@ -80,6 +80,7 @@ export class UserController {
         }
 
         const userId = Number(req.user.sub);
+        // console.log(userId);
         const machineImages = file.map((file) => file.filename);
         const result = await this.userService.userInfo(userId, userInfoDto, machineImages);
         return {

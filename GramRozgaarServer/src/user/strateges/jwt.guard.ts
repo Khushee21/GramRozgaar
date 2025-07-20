@@ -11,15 +11,15 @@ export class JwtAuthGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean {
         const request = context.switchToHttp().getRequest<Request>();
         const authHeader = request.headers['authorization'];
-        // console.log('Auth header:', authHeader);
+        console.log('Auth header:', authHeader);
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            //console.log('❌ Missing or malformed Authorization header');
+            console.log('❌ Missing or malformed Authorization header');
             throw new UnauthorizedException('Authorization token not found');
         }
 
         const token = authHeader.split(' ')[1];
-        //console.log(token);
+        console.log(token);
         try {
             const decoded = jwt.verify(token, process.env.AT_SECRET!);
             console.log('Decoded JWT:', decoded);

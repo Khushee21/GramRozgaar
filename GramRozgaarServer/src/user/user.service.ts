@@ -74,8 +74,11 @@ export class UserService {
     async userInfo(userId: number, data: any, machineImages: string[]) {
         try {
             const { workType, isMachineAvailable, isAvailableForWork, machineType } = data;
-
-            console.log(workType, isMachineAvailable, isAvailableForWork, machineType);
+            console.log("heyyyy", workType, isMachineAvailable, isAvailableForWork, machineType);
+            if (!userId) {
+                throw new NotFoundException("user not found")
+            }
+            console.log(userId);
 
             if (!workType || typeof isAvailableForWork !== 'boolean' || typeof isMachineAvailable !== 'boolean') {
                 throw new NotFoundException('User Information is required!');
@@ -89,8 +92,21 @@ export class UserService {
                 where: { userId: Number(userId) },
             });
 
-            if (existingInfo && existingInfo.machineAlreadySet) {
-                throw new BadRequestException('User info already set');
+            if (existingInfo) {
+                const updatedInfo = await this.prisma.userInfo.update({
+                    where: { userId: Number(userId) },
+                    data: {
+                        workType,
+                        isAvailableForWork,
+                        isMachineAvailable,
+                        machineType,
+                        machineImages,
+                    },
+                });
+                return {
+                    message: 'User Info updated successfully',
+                    info: updatedInfo,
+                };
             }
 
             const info = await this.prisma.userInfo.create({
@@ -104,7 +120,7 @@ export class UserService {
                 },
             });
 
-            console.log('User info created:', info);
+            // console.log('User info created:', info);
 
             return {
                 message: 'User Info saved successfully',
@@ -117,26 +133,26 @@ export class UserService {
 
     //get profile 
     async userProfile(phoneNumber: string) {
-        try {
-            const user = await this.prisma.user.findUnique({
-                where: { phoneNumber }
-            });
-
-            if (!user) {
-                throw new Error('User not found or phone number mismatch');
-            }
-
-            return {
-                name: user.name,
-                phoneNumber: user.phoneNumber,
-                age: user.age,
-                village: user.village,
-                profileImage: user.profileImage,
-                createdAt: user.createdAt,
-            };
-        } catch (error: any) {
-            console.error('Error fetching user profile:', error);
-            throw new Error('Failed to fetch user profile');
+        if (!phoneNumber) {
+            throw new BadRequestException('Phone number is required');
         }
+
+        const user = await this.prisma.user.findUnique({
+            where: { phoneNumber },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found or phone number mismatch');
+        }
+
+        return {
+            name: user.name,
+            phoneNumber: user.phoneNumber,
+            age: user.age,
+            village: user.village,
+            profileImage: user.profileImage,
+            createdAt: user.createdAt,
+        };
     }
+
 }
