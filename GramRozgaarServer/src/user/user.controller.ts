@@ -91,7 +91,7 @@ export class UserController {
         };
     }
 
-    @Get('user-profile')
+    @Get('user-info')
     async userProfile(
         // @Query('userId') userId: number,
         @Query('phoneNumber') phoneNumber: string
