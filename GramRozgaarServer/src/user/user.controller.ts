@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors, Get } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
@@ -89,5 +89,13 @@ export class UserController {
                 userId: result.info.userId.toString(),
             },
         };
+    }
+
+    @Get('user-profile')
+    async userProfile(
+        // @Query('userId') userId: number,
+        @Query('phoneNumber') phoneNumber: string
+    ) {
+        return this.userService.userProfile(phoneNumber);
     }
 };

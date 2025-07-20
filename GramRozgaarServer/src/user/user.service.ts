@@ -86,7 +86,7 @@ export class UserService {
             // }
 
             const existingInfo = await this.prisma.userInfo.findUnique({
-                where: { userId: Number(userId) }, // userId is a string
+                where: { userId: Number(userId) },
             });
 
             if (existingInfo && existingInfo.machineAlreadySet) {
@@ -115,4 +115,28 @@ export class UserService {
         }
     }
 
+    //get profile 
+    async userProfile(phoneNumber: string) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { phoneNumber }
+            });
+
+            if (!user) {
+                throw new Error('User not found or phone number mismatch');
+            }
+
+            return {
+                name: user.name,
+                phoneNumber: user.phoneNumber,
+                age: user.age,
+                village: user.village,
+                profileImage: user.profileImage,
+                createdAt: user.createdAt,
+            };
+        } catch (error: any) {
+            console.error('Error fetching user profile:', error);
+            throw new Error('Failed to fetch user profile');
+        }
+    }
 }

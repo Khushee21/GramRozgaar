@@ -1,11 +1,15 @@
 'use client';
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
-import { selectCurrentTheme, selectCurrentLanguage, selectCurrentUser } from "@/store/Seletor";
+import {
+    selectCurrentTheme,
+    selectCurrentLanguage,
+    selectCurrentUser
+} from "@/store/Seletor";
 import { LinearGradient } from "expo-linear-gradient";
 import { translations } from "@/src/constants/translation";
-import Ionicons from "react-native-vector-icons/Ionicons"; // ✅ Fixed this line
+import Ionicons from "react-native-vector-icons/Ionicons";
 import { API_URL } from "@/services/API";
 import { authFetch } from "@/services/authFetch";
 import { useRouter } from "expo-router";
@@ -21,25 +25,22 @@ const Header = () => {
 
     useEffect(() => {
         if (!user) {
+            console.log("No user found");
             router.push("/auth/LoginRegistrationScreen");
         }
     }, [user]);
 
     useEffect(() => {
-        if (!user) return;
-
-        const fetchImage = async () => {
+        const fetchImage = async (): Promise<void> => {
             try {
-                const res = await authFetch(`${API_URL}/users/${user.phoneNumber}/profile-image`, {
+                const res = await authFetch(`${API_URL}/users/user-profile?phoneNumber=${user.phoneNumber}`, {
                     method: "GET",
                 });
 
-                if (!res.ok) {
-                    throw new Error("Failed to fetch image");
-                }
+                if (!res.ok) throw new Error("Failed to fetch image");
+
                 const data = await res.json();
-                console.log("Profile image:", data.profileImage);
-                setProfileIcon(`${API_URL}/uploads/${data.profileImage}`); // ✅ Use full URL to show image
+                setProfileIcon(`${API_URL}/uploads/${data.profileImage}`);
             } catch (err) {
                 console.error("Image fetch error:", err);
             }
@@ -49,50 +50,46 @@ const Header = () => {
     }, [user]);
 
     return (
-        <View style={[styles.container, { backgroundColor: isDark ? "#121212" : "#f5f5f5" }]}>
-            <LinearGradient colors={["#2E5C4D", "#68B684"]} style={styles.header}>
-                <View style={styles.headerContent}>
+        <LinearGradient colors={["#2E5C4D", "#68B684"]} style={styles.header}>
+            <View style={styles.headerContent}>
+                <Text style={styles.title}>{t.title}</Text>
+                <TouchableOpacity>
                     {profileIcon ? (
                         <Image source={{ uri: profileIcon }} style={styles.icon} />
                     ) : (
-                        <Ionicons name="person-circle-outline" size={40} color="#fff" style={styles.icon} />
+                        <Ionicons name="person-circle-outline" size={45} color="#fff" />
                     )}
-                    <Text style={styles.welcome}>{t.title}</Text>
-                </View>
-            </LinearGradient>
-        </View>
+                </TouchableOpacity>
+            </View>
+        </LinearGradient>
     );
 };
 
 export default Header;
 
+
 const styles = StyleSheet.create({
-    container: {
-        borderBottomWidth: 0.3,
-        borderColor: "#ccc",
-        borderRadius: 20,
-        elevation: 4,
-    },
     header: {
-        paddingTop: 60,
-        paddingBottom: 30,
-        paddingLeft: 5,
+        paddingTop: 50,
+        paddingBottom: 20,
+        paddingHorizontal: 20,
         borderBottomLeftRadius: 30,
         borderBottomRightRadius: 30,
-        alignItems: "center",
+        elevation: 4,
     },
     headerContent: {
+        flexDirection: "row",
+        justifyContent: "space-between",
         alignItems: "center",
     },
-    icon: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        marginBottom: 10,
-    },
-    welcome: {
-        fontSize: 29,
+    title: {
+        fontSize: 28,
         fontWeight: "bold",
         color: "#fff",
+    },
+    icon: {
+        width: 45,
+        height: 45,
+        borderRadius: 22.5,
     },
 });
