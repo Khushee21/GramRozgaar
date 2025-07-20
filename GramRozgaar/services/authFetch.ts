@@ -8,19 +8,21 @@ export async function authFetch(url: string, options: RequestInit = {}) {
     const userData = await AsyncStorage.getItem('user');
     const user = userData ? JSON.parse(userData) : null;
 
-    const authOptions = {
+    const isFormData = options.body instanceof FormData;
+
+    const authOptions: RequestInit = {
         ...options,
         headers: {
             ...(options.headers || {}),
             Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
+            ...(isFormData ? {} : { 'Content-Type': 'application/json' }), // ✅ Only set for JSON
         },
     };
 
     let response = await fetch(url, authOptions);
 
+    // Retry logic unchanged
     if (response.status === 401 && refreshToken && user?.id) {
-        // Try refreshing tokens
         const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
             method: 'POST',
             headers: {
@@ -35,17 +37,15 @@ export async function authFetch(url: string, options: RequestInit = {}) {
         const refreshData = await refreshRes.json();
 
         if (refreshRes.ok) {
-            // Save new tokens
             await AsyncStorage.setItem('accessToken', refreshData.accessToken);
             await AsyncStorage.setItem('refreshToken', refreshData.refreshToken);
 
-            // Retry original request with new access token
-            const retryOptions = {
+            const retryOptions: RequestInit = {
                 ...options,
                 headers: {
                     ...(options.headers || {}),
                     Authorization: `Bearer ${refreshData.accessToken}`,
-                    'Content-Type': 'application/json',
+                    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
                 },
             };
 
