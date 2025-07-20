@@ -31,9 +31,10 @@ const Header = () => {
     }, [user]);
 
     useEffect(() => {
+        // console.log(user);
         const fetchImage = async (): Promise<void> => {
             try {
-                const res = await authFetch(`${API_URL}/users/user-profile?phoneNumber=${user.phoneNumber}`, {
+                const res = await authFetch(`${API_URL}/users/user-info?phoneNumber=${user.phoneNumber}`, {
                     method: "GET",
                 });
 

@@ -12,6 +12,7 @@ import Dashboard from './home/dashbord';
 import HomeDashboard from './home/HomeDashboard';
 import Workers from './home/Workers';
 import AllMachines from './home/Machine';
+import UserProfile from './auth/Profile';
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +48,7 @@ export default function Navigation() {
                         <Stack.Screen name="HomeDashboard" component={HomeDashboard} />
                         <Stack.Screen name="Workers" component={Workers} />
                         <Stack.Screen name="Machines" component={AllMachines} />
+                        <Stack.Screen name="Profile" component={UserProfile} />
                     </>
                 )}
             </Stack.Navigator>

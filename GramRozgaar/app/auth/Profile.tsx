@@ -1,9 +1,10 @@
 import { View } from "react-native"
+import Profile from "@/components/auth/profile";
 
 const UserProfile = () => {
     return (
         <View>
-            User Profile
+            <Profile />
         </View>
     )
 }

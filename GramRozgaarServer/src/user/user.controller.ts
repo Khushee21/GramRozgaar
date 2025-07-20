@@ -80,6 +80,7 @@ export class UserController {
         }
 
         const userId = Number(req.user.sub);
+        // console.log(userId);
         const machineImages = file.map((file) => file.filename);
         const result = await this.userService.userInfo(userId, userInfoDto, machineImages);
         return {
@@ -92,7 +93,7 @@ export class UserController {
     }
 
     //get user profile
-    @Get('user-profile')
+    @Get('user-info')
     async userProfile(
         @Query('phoneNumber') phoneNumber: string
     ) {
@@ -100,7 +101,7 @@ export class UserController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('user-info')
+    @Get('user-profile')
     async getUserInfo(@Req() req: RequestWithUser) {
         const userId = Number(req.user.sub);
         return this.userService.getUserInfo(userId);

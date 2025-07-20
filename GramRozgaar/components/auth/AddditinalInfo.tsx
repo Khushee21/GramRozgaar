@@ -66,6 +66,7 @@ const Info = () => {
         formData.append('isMachineAvailable', String(isMachineAvailable));
         formData.append('workType', work);
         formData.append('machineType', machine);
+        console.log(user);
         machineImages.forEach((uri, index) => {
             const filename = uri.split('/').pop();
             const match = /\.(\w+)$/.exec(filename ?? '');
