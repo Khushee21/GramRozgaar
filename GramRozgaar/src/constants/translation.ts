@@ -15,6 +15,8 @@ export const translations = {
         language: "भाषा",
         hindi: "हिन्दी",
         english: "अंग्रेज़ी",
+        machineImages: "मशीनछवि",
+        EditProfile: "प्रोफ़ाइल"
     },
     hi: {
         welcome: "Hello",
@@ -31,5 +33,7 @@ export const translations = {
         language: "Language",
         hindi: "Hindi",
         english: "English",
+        machineImages: "Machine Images",
+        EditProfile: "Edit Profile"
     }
 };
