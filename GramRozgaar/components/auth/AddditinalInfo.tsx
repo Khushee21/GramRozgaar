@@ -66,7 +66,7 @@ const Info = () => {
         formData.append('isMachineAvailable', String(isMachineAvailable));
         formData.append('workType', work);
         formData.append('machineType', machine);
-        console.log(user);
+        // console.log(user);
         machineImages.forEach((uri, index) => {
             const filename = uri.split('/').pop();
             const match = /\.(\w+)$/.exec(filename ?? '');
@@ -78,7 +78,7 @@ const Info = () => {
                 type,
             } as any);
         });
-        const token = user?.token;
+
         try {
             const res = await authFetch(`${API_URL}/users/userInfo`, {
                 method: 'POST',
@@ -102,13 +102,13 @@ const Info = () => {
             console.log('Submission error', err);
         }
 
-        console.log("Submit info:", {
-            isAvailableForWork,
-            work,
-            isMachineAvailable,
-            machine,
-            machineImages,
-        });
+        // console.log("Submit info:", {
+        //     isAvailableForWork,
+        //     work,
+        //     isMachineAvailable,
+        //     machine,
+        //     machineImages,
+        // });
     };
 
     return (

@@ -74,7 +74,15 @@ export class UserService {
     async userInfo(userId: number, data: any, machineImages: string[]) {
         try {
             const { workType, isMachineAvailable, isAvailableForWork, machineType } = data;
-            console.log("heyyyy", workType, isMachineAvailable, isAvailableForWork, machineType);
+            console.log('Received User Info Payload:', {
+                userId,
+                workType,
+                isAvailableForWork,
+                isMachineAvailable,
+                machineType,
+                machineImages,
+            });
+
             if (!userId) {
                 throw new NotFoundException("user not found")
             }
@@ -161,5 +169,35 @@ export class UserService {
             where: { userId },
         });
         return userInfo;
+    }
+
+    //update user profile
+    async updateUserProfile(userId: number, data: any, machineImages: Express.Multer.File[]) {
+        if (!userId) {
+            throw new NotFoundException('User id not found!');
+        }
+
+        const user = await this.prisma.userInfo.findUnique({
+            where: { userId: userId },
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found!');
+        }
+
+        const updatedUser = await this.prisma.userInfo.update({
+            where: {
+                userId: userId
+            },
+            data: {
+                workType: data.workType,
+                isAvailableForWork: data.isAvailableForWork === 'true' || data.isAvailableForWork === true,
+                isMachineAvailable: data.isMachineAvailable === 'true' || data.isMachineAvailable === true,
+                machineType: data.machineType,
+                machineImages: machineImages?.map(file => file.filename) || [],
+            },
+        });
+
+        return { message: 'User profile updated successfully.', updatedUser };
     }
 }

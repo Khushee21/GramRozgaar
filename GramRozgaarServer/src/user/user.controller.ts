@@ -1,8 +1,8 @@
-import { Body, Controller, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors, Get } from "@nestjs/common";
+import { Body, Controller, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors, Get, Patch, Param, ParseIntPipe } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
-import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
+import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from 'multer';
 import { BadRequestException } from "@nestjs/common";
 import { UserInfoDto } from "./dto/user-info.dto";
@@ -80,7 +80,7 @@ export class UserController {
         }
 
         const userId = Number(req.user.sub);
-        // console.log(userId);
+        console.log(userId);
         const machineImages = file.map((file) => file.filename);
         const result = await this.userService.userInfo(userId, userInfoDto, machineImages);
         return {
@@ -106,4 +106,20 @@ export class UserController {
         const userId = Number(req.user.sub);
         return this.userService.getUserInfo(userId);
     }
+
+    // updateUserInfo
+    @Patch(':userId')
+    @UseInterceptors(FileFieldsInterceptor([
+        { name: 'machineImages', maxCount: 5 }
+    ]))
+    @UseGuards(JwtAuthGuard)
+    async updateUserInfo(
+        @Param('userId', ParseIntPipe) userId: number,
+        @Body() updateData: UserInfoDto,
+        @UploadedFiles() files: { machineImages?: Express.Multer.File[] },
+        @Req() req
+    ) {
+        return this.userService.updateUserProfile(userId, updateData, files.machineImages || []);
+    }
+
 };
