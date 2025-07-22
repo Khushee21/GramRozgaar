@@ -10,8 +10,9 @@ import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Dashboard from './home/dashbord';
 import HomeDashboard from './home/HomeDashboard';
-import Workers from './home/Workers';
-import AllMachines from './home/Machine';
+import AllWorkerPage from './workers/AllWorkers';
+import AllMachines from './machines/AllMachines';
+
 import UserProfile from './auth/Profile';
 
 const Stack = createNativeStackNavigator();
@@ -46,7 +47,7 @@ export default function Navigation() {
                         <Stack.Screen name="Home" component={HomeScreen} />
                         <Stack.Screen name="Dashboard" component={Dashboard} />
                         <Stack.Screen name="HomeDashboard" component={HomeDashboard} />
-                        <Stack.Screen name="Workers" component={Workers} />
+                        <Stack.Screen name="Workers" component={AllWorkerPage} />
                         <Stack.Screen name="Machines" component={AllMachines} />
                         <Stack.Screen name="Profile" component={UserProfile} />
                     </>

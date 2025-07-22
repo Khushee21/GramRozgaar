@@ -11,7 +11,7 @@ const FooterBar = () => {
     return (
         <View style={styles.container}>
             <TouchableOpacity
-                onPress={() => router.push('/home/Machine')}>
+                onPress={() => router.push('/machines/AllMachines')}>
                 <MaterialIcons name="precision-manufacturing" size={28} color="#2E5C4D" />
             </TouchableOpacity>
 
@@ -23,7 +23,7 @@ const FooterBar = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-                onPress={() => router.push('/home/Workers')} >
+                onPress={() => router.push('/workers/AllWorkers')} >
                 <MaterialIcons name="engineering" size={28} color="#2E5C4D" />
             </TouchableOpacity>
         </View>

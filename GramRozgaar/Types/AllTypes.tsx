@@ -12,3 +12,10 @@ export interface Auth {
     confirmPassword: string;
     languagePreference?: 'en' | 'hi';
 }
+
+export interface Machine {
+    name: string;
+    phoneNumber: string;
+    workType: string;
+    star: number;
+}
