@@ -15,6 +15,7 @@ import { UploadedFiles } from "@nestjs/common";
 export class UserController {
     constructor(private readonly userService: UserService) { }
 
+    //sign up
     @Post('signup')
     @UseInterceptors(FileInterceptor('profileImage', {
         storage: diskStorage({
@@ -51,7 +52,7 @@ export class UserController {
 
     }
 
-
+    //sign in
     @Post('signin')
     async signin(@Body() loginUser: LoginUserDto) {
         const { phoneNumber, password } = loginUser;
@@ -97,6 +98,7 @@ export class UserController {
     async userProfile(
         @Query('phoneNumber') phoneNumber: string
     ) {
+        // console.log(phoneNumber);
         return this.userService.userProfile(phoneNumber);
     }
 

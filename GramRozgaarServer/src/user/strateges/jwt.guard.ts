@@ -11,7 +11,7 @@ export class JwtAuthGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean {
         const request = context.switchToHttp().getRequest<Request>();
         const authHeader = request.headers['authorization'];
-        console.log(authHeader);
+        // console.log(authHeader);
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             throw new UnauthorizedException('Authorization token not found');
         }
@@ -20,10 +20,10 @@ export class JwtAuthGuard implements CanActivate {
         try {
             const decoded = jwt.verify(token, process.env.AT_SECRET!);
             request['user'] = decoded;
-            console.log(decoded);
+            // console.log(decoded);
             return true;
         } catch (err) {
-            console.log('JWT verification failed:', err.message);
+            // console.log('JWT verification failed:', err.message);
             throw new UnauthorizedException('Invalid or expired token');
         }
     }

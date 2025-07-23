@@ -13,9 +13,15 @@ export interface Auth {
     languagePreference?: 'en' | 'hi';
 }
 
-export interface Machine {
+export type Machine = {
     name: string;
-    phoneNumber: string;
+    userId: number;
     workType: string;
-    star: number;
-}
+    isMachineAvailable: boolean;
+    machineType?: string;
+    star?: number;
+    user?: {
+        phoneNumber: string;
+        profileImage?: string;
+    };
+};

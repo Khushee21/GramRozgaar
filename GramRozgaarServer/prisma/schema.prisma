@@ -29,14 +29,16 @@ model User {
 
 model UserInfo {
   id                  String   @id @default(uuid())
+  name                String
   userId              Int   @unique
   workType            String
-  isAvailableForWork  Boolean
-  isMachineAvailable  Boolean
+  isAvailableForWork  Boolean  @default(false)
+  isMachineAvailable  Boolean  @default(false)
   machineType         String?
   machineImages       String[]
   createdAt           DateTime @default(now())
   machineAlreadySet   Boolean  @default(false)
 
   user User @relation(fields: [userId], references: [id])
+  @@map("userinfo")
 }

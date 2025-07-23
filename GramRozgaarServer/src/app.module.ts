@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { PrismaService } from './prisma/prisma.service';
+import { Worker_machine } from './Worker_Machine/worker_machine.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PrismaService } from './prisma/prisma.service';
     }),
     PrismaModule,
     UserModule,
+    Worker_machine
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

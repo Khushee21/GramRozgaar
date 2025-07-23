@@ -153,6 +153,13 @@ const Profile = () => {
                         editable={false}
                     />
 
+                    <Text style={styles.label}>Name:</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={editableInfo?.name}
+                        editable={false}
+                    />
+
                     <View style={styles.toggleContainer}>
                         <Text style={styles.label}>{t.availableForWork}</Text>
                         <Switch

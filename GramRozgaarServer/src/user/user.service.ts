@@ -84,23 +84,28 @@ export class UserService {
             });
 
             if (!userId) {
-                throw new NotFoundException("user not found")
+                throw new NotFoundException("User not found");
             }
-            console.log(userId);
 
             if (!workType || typeof isAvailableForWork !== 'boolean' || typeof isMachineAvailable !== 'boolean') {
                 throw new NotFoundException('User Information is required!');
             }
 
-            // if (isMachineAvailable && !machineType) {
-            //     throw new NotFoundException('Machine type is required if machine is available');
-            // }
+            const user = await this.prisma.user.findUnique({
+                where: { id: Number(userId) },
+                select: { name: true },
+            });
 
-            const existingInfo = await this.prisma.userInfo.findUnique({
+            if (!user || !user.name) {
+                throw new NotFoundException("User not found or name is missing.");
+            }
+
+            // Check if UserInfo already exists for this user
+            const existingUserInfo = await this.prisma.userInfo.findUnique({
                 where: { userId: Number(userId) },
             });
 
-            if (existingInfo) {
+            if (existingUserInfo) {
                 const updatedInfo = await this.prisma.userInfo.update({
                     where: { userId: Number(userId) },
                     data: {
@@ -117,27 +122,29 @@ export class UserService {
                 };
             }
 
+            // Create new UserInfo
             const info = await this.prisma.userInfo.create({
                 data: {
                     userId: Number(userId),
+                    name: user.name,
                     workType,
-                    isAvailableForWork: Boolean(isAvailableForWork),
-                    isMachineAvailable: Boolean(isMachineAvailable),
+                    isAvailableForWork,
+                    isMachineAvailable,
                     machineType,
                     machineImages,
                 },
             });
 
-            // console.log('User info created:', info);
-
             return {
                 message: 'User Info saved successfully',
                 info,
             };
+
         } catch (err: any) {
             throw new InternalServerErrorException(err.message);
         }
     }
+
 
     //get profile 
     async userProfile(phoneNumber: string) {
@@ -165,11 +172,21 @@ export class UserService {
 
     //get user -profile
     async getUserInfo(userId: number) {
+        // console.log("Fetching userInfo for:", userId);
+
         const userInfo = await this.prisma.userInfo.findMany({
             where: { userId },
         });
+
+        if (userInfo.length === 0) {
+            //  console.log("No userInfo found for this userId.");
+        } else {
+            // console.log("Found userInfo:", userInfo);
+        }
+
         return userInfo;
     }
+
 
     //update user profile
     async updateUserProfile(userId: number, data: any, machineImages: Express.Multer.File[]) {
