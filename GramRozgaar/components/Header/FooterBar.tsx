@@ -34,6 +34,10 @@ export default FooterBar;
 
 const styles = StyleSheet.create({
     container: {
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
         flexDirection: "row",
         justifyContent: "space-around",
         alignItems: "center",
@@ -42,7 +46,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderColor: "#ddd",
         paddingHorizontal: 20,
-        top: height - 150,
+        zIndex: 999,
     },
     homeIconWrapper: {
         backgroundColor: "#2E5C4D",
@@ -57,3 +61,5 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
     },
 });
+
+

@@ -9,7 +9,7 @@ export class Worker_machineServices {
         private authService: AuthServices
     ) { }
 
-    async getAllWorker(userId: number) {
+    async getAllMachine(userId: number) {
         const userWithMachines = await this.prisma.userInfo.findMany({
             where: {
                 isMachineAvailable: true,

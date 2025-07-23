@@ -10,20 +10,9 @@ import {
 } from "@/store/Seletor";
 import { authFetch } from "@/services/authFetch";
 import { API_URL } from "@/services/API";
+import { Machine } from "@/Types/AllTypes";
+import { translations } from "@/src/constants/translation";
 
-type Machine = {
-    userId: number;
-    name: string;
-    workType: string;
-    machineType?: string;
-    isMachineAvailable?: boolean;
-    star?: number;
-    machineImages?: string[];
-    user?: {
-        phoneNumber?: string;
-        profileImage?: string;
-    };
-};
 
 const AllMachines = () => {
     const user = useSelector(selectCurrentUser);
@@ -31,6 +20,7 @@ const AllMachines = () => {
     const language = useSelector(selectCurrentLanguage);
 
     const [machines, setMachines] = useState<Machine[]>([]);
+    const t = translations[language];
 
     useEffect(() => {
         const fetchAllMachines = async () => {
@@ -40,7 +30,7 @@ const AllMachines = () => {
                 });
                 const data = await res.json();
                 setMachines(data);
-            } catch (err) {
+            } catch (err: any) {
                 console.log("Error fetching machines:", err);
             }
         };
@@ -51,45 +41,47 @@ const AllMachines = () => {
     return (
         <View style={styles.container}>
             <Header />
-            <Text style={styles.title}>🚜 All Available Machines</Text>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                {machines.length === 0 ? (
-                    <Text style={styles.noDataText}>No machines available</Text>
-                ) : (
-                    machines.map((machine, index) => (
-                        <View key={index} style={styles.card}>
-                            {machine.user?.profileImage && (
-                                <Image
-                                    source={{ uri: `${API_URL}/uploads/${machine.user.profileImage}` }}
-                                    style={styles.profileImage}
-                                />
-                            )}
+            <Text style={styles.title}>🚜 {t.machineImages}</Text>
 
-                            <Text style={styles.cardTitle}>{machine.name}</Text>
-                            <Text style={styles.machineType}>{machine.machineType || "General"}</Text>
+            {machines.length === 0 ? (
+                <Text style={styles.noDataText}>{t.noMachinesAvailable || "No machines available"}</Text>
+            ) : (
+                machines.map((machine, index) => (
+                    <View key={index} style={styles.card}>
+                        {machine.user?.profileImage && (
+                            <Image
+                                source={{ uri: `${API_URL}/uploads/${machine.user.profileImage}` }}
+                                style={styles.profileImage}
+                            />
+                        )}
 
-                            <Text style={styles.cardText}>📞 {machine.user?.phoneNumber || "N/A"}</Text>
-                            <Text style={styles.cardText}>🛠️ Work Type: {machine.workType}</Text>
-                            <Text style={styles.cardText}>⭐ Rating: {machine.star || "N/A"}</Text>
+                        <Text style={styles.cardTitle}>{machine.name}</Text>
+                        <Text style={styles.machineType}>
+                            {machine.machineType || t.machineType}
+                        </Text>
 
-                            <Text style={machine.isMachineAvailable ? styles.available : styles.unavailable}>
-                                {machine.isMachineAvailable ? "✅ Available" : "❌ Not Available"}
-                            </Text>
-                            {machine.machineImages && machine.machineImages.length > 0 && (
-                                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageGallery}>
-                                    {machine.machineImages.map((img, idx) => (
-                                        <Image
-                                            key={idx}
-                                            source={{ uri: `${API_URL}/uploads/machineImg/${img}` }}
-                                            style={styles.machineImage}
-                                        />
-                                    ))}
-                                </ScrollView>
-                            )}
-                        </View>
-                    ))
-                )}
-            </ScrollView>
+                        <Text style={styles.cardText}>📞 {machine.user?.phoneNumber || "N/A"}</Text>
+                        <Text style={styles.cardText}>⭐ {t.rating || "Rating"}: {machine.star || "N/A"}</Text>
+
+                        <Text style={machine.isMachineAvailable ? styles.available : styles.unavailable}>
+                            {machine.isMachineAvailable ? `✅ ${t.available || "Available"}` : `❌ ${t.notAvailable || "Not Available"}`}
+                        </Text>
+
+                        {machine.machineImages && machine.machineImages.length > 0 && (
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageGallery}>
+                                {machine.machineImages.map((img, idx) => (
+                                    <Image
+                                        key={idx}
+                                        source={{ uri: `${API_URL}/uploads/machineImg/${img}` }}
+                                        style={styles.machineImage}
+                                    />
+                                ))}
+                            </ScrollView>
+                        )}
+                    </View>
+                ))
+            )}
+
             <FooterBar />
         </View>
     );

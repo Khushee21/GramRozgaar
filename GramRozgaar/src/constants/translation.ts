@@ -1,4 +1,3 @@
-// constants/translations.ts
 export const translations = {
     en: {
         welcome: "नमस्ते",
@@ -15,8 +14,13 @@ export const translations = {
         language: "भाषा",
         hindi: "हिन्दी",
         english: "अंग्रेज़ी",
-        machineImages: "मशीनछवि",
-        EditProfile: "प्रोफ़ाइल"
+        machineImages: "मशीन की जानकारी",
+        EditProfile: "प्रोफ़ाइल",
+        noMachinesAvailable: "कोई मशीन उपलब्ध नहीं है",
+        available: "उपलब्ध",
+        notAvailable: "उपलब्ध नहीं",
+        rating: "रेटिंग",
+        work: "काम",
     },
     hi: {
         welcome: "Hello",
@@ -33,7 +37,12 @@ export const translations = {
         language: "Language",
         hindi: "Hindi",
         english: "English",
-        machineImages: "Machine Images",
-        EditProfile: "Edit Profile"
+        machineImages: "Machine Info",
+        EditProfile: "Edit Profile",
+        noMachinesAvailable: "No machines available",
+        available: "Available",
+        notAvailable: "Not Available",
+        rating: "Rating",
+        work: "work",
     }
 };

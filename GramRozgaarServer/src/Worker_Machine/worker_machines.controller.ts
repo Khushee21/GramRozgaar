@@ -9,6 +9,6 @@ export class Machine_WorkerController {
     @Get()
     @UseGuards(JwtAuthGuard)
     async AllWorkers(@Req() req: any) {
-        return this.machine_workerServices.getAllWorker(req.user.id);
+        return this.machine_workerServices.getAllMachine(req.user.id);
     }
 }

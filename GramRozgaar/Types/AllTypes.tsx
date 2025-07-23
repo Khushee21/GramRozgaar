@@ -14,14 +14,27 @@ export interface Auth {
 }
 
 export type Machine = {
-    name: string;
     userId: number;
+    name: string;
     workType: string;
-    isMachineAvailable: boolean;
     machineType?: string;
+    isMachineAvailable?: boolean;
     star?: number;
+    machineImages?: string[];
     user?: {
-        phoneNumber: string;
+        phoneNumber?: string;
         profileImage?: string;
     };
 };
+
+export type Worker = {
+    userId: number;
+    name: string;
+    workType: string;
+    isAvailableToWork?: boolean;
+    star?: number;
+    user?: {
+        phoneNumber?: string;
+        profileImage?: string;
+    }
+}
