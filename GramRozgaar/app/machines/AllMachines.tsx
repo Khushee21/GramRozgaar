@@ -25,7 +25,7 @@ const AllMachines = () => {
     useEffect(() => {
         const fetchAllMachines = async () => {
             try {
-                const res = await authFetch(`${API_URL}/workers`, {
+                const res = await authFetch(`${API_URL}/workers/all-machines`, {
                     method: "GET",
                 });
                 const data = await res.json();

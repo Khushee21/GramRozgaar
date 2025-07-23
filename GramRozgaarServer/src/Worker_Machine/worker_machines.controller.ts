@@ -6,9 +6,15 @@ import { Worker_machineServices } from './worker_machine.services';
 export class Machine_WorkerController {
     constructor(private readonly machine_workerServices: Worker_machineServices) { }
 
-    @Get()
+    @Get('all-machines')
+    @UseGuards(JwtAuthGuard)
+    async AllMachines(@Req() req: any) {
+        return this.machine_workerServices.getAllMachine(req.user.id);
+    }
+
+    @Get('all-workers')
     @UseGuards(JwtAuthGuard)
     async AllWorkers(@Req() req: any) {
-        return this.machine_workerServices.getAllMachine(req.user.id);
+        return this.machine_workerServices.getAllWorker(req.user.id);
     }
 }

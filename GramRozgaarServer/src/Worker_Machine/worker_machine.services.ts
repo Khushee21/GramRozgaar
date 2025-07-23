@@ -9,12 +9,13 @@ export class Worker_machineServices {
         private authService: AuthServices
     ) { }
 
+    //All machines
     async getAllMachine(userId: number) {
         const userWithMachines = await this.prisma.userInfo.findMany({
             where: {
                 isMachineAvailable: true,
                 machineType: {
-                    not: "",           // Exclude empty strings
+                    not: "",
                 },
                 userId: {
                     not: userId,
@@ -46,5 +47,37 @@ export class Worker_machineServices {
         });
 
         return filteredResult;
+    }
+
+    //all workers
+    async getAllWorker(userId: number) {
+        const WorkersAvailable = await this.prisma.userInfo.findMany({
+            where: {
+                // isAvailableForWork: true,
+                workType: {
+                    not: "",
+                },
+                userId: {
+                    not: userId,
+                },
+            },
+            select: {
+                userId: true,
+                name: true,
+                isAvailableForWork: true,
+                workType: true,
+                user: {
+                    select: {
+                        phoneNumber: true,
+                        profileImage: true,
+                    },
+                },
+            }
+        });
+
+        if (!WorkersAvailable || WorkersAvailable.length === 0) {
+            throw new NotFoundException("No workers found");
+        }
+        return WorkersAvailable;
     }
 }
