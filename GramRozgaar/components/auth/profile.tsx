@@ -5,7 +5,7 @@ import {
     View,
     Image,
     StyleSheet,
-    ActivityIndicator,
+
     SafeAreaView,
     TextInput,
     TouchableOpacity,
@@ -13,7 +13,7 @@ import {
     Button,
     Switch,
 } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { API_URL } from "@/services/API";
 import { authFetch } from "@/services/authFetch";
 import Header from "@/components/Header/Header";
@@ -26,6 +26,8 @@ import { translations } from "@/src/constants/translation";
 import LottieView from "lottie-react-native";
 import { Dimensions } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
+import { setLanguage } from "@/store/PreferencesSlice";
+import { setTheme } from "@/store/PreferencesSlice";
 
 const { width } = Dimensions.get("window");
 
@@ -43,6 +45,8 @@ const Profile = () => {
     const [isMachineAvailable, setIsMachineAvailable] = useState(false);
     const [work, setWork] = useState('');
     const [machine, setMachine] = useState('');
+    const theme = useSelector(selectCurrentTheme);
+    const dispatch = useDispatch()
 
     const handleImagePick = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -123,28 +127,59 @@ const Profile = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <View style={styles.loader}>
-                <ActivityIndicator size="large" color="#00aaff" />
-            </View>
-        );
-    }
-
-    if (!userInfo) {
-        return (
-            <View style={styles.loader}>
-                <Text>No data available</Text>
-            </View>
-        );
-    }
-
+    const styles = getStyles(theme);
     return (
-        <SafeAreaView >
+        <SafeAreaView style={styles.container}>
             <Header />
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <Text style={styles.heading}>👤 {t.EditProfile}</Text>
 
+                <View style={styles.switchRow}>
+                    <Text style={styles.label}>{t.language}</Text>
+                    <View style={styles.buttonGroup}>
+                        <TouchableOpacity
+                            style={[
+                                styles.toggleButton,
+                                language === 'en' && styles.selectedButton,
+                            ]}
+                            onPress={() => dispatch(setLanguage({ phoneNumber: user?.phoneNumber, language: "en" }))}>
+                            <Text style={styles.toggleButtonText}>English</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.toggleButton, language === 'hi' && styles.selectedButton]}
+                            onPress={() => dispatch(setLanguage({ phoneNumber: user?.phoneNumber, language: "hi" }))}>
+                            <Text style={styles.toggleButtonText}>हिन्दी</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                <View style={styles.switchRow}>
+                    <Text style={styles.label}>🎨 {t.theme || "Theme"}</Text>
+                    <View style={styles.buttonGroup}>
+                        <TouchableOpacity
+                            style={[
+                                styles.toggleButton,
+                                theme === "light" && styles.selectedButton,
+                            ]}
+                            onPress={() => dispatch(setTheme({ phoneNumber: user?.phoneNumber, theme: "light" }))}
+
+                        >
+                            <Text style={styles.toggleButtonText}>☀️ Light</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[
+                                styles.toggleButton,
+                                theme === "dark" && styles.selectedButton,
+                            ]}
+                            onPress={() => dispatch(setTheme({ phoneNumber: user?.phoneNumber, theme: "dark" }))}
+                        >
+                            <Text style={styles.toggleButtonText}>🌙 Dark</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                {/* <View style={styles.switchRow}>
+                    <Text style={styles.label}>🎨 {t.theme || "Theme"}</Text>
+
+                </View> */}
                 <View style={styles.card}>
                     <Text style={styles.label}>Emp ID:</Text>
                     <TextInput
@@ -249,98 +284,127 @@ const Profile = () => {
 export default Profile;
 
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#e0f7fa",
-    },
-    scrollContent: {
-        padding: 16,
-        paddingBottom: 300,
-        flexGrow: 1,
-        alignItems: "center",
-    },
-    heading: {
-        fontSize: 28,
-        fontWeight: "bold",
-        marginBottom: 20,
-        color: "#00796b",
-        textAlign: "center",
-    },
-    card: {
-        backgroundColor: "rgba(255, 255, 255, 0.9)",
-        borderRadius: 16,
-        padding: 24,
-        width: "100%",
-        maxWidth: 400,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 5 },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-        elevation: 8,
-    },
-    label: {
-        fontSize: 14,
-        fontWeight: "600",
-        color: "#555",
-        marginTop: 14,
-    },
-    input: {
-        fontSize: 16,
-        fontWeight: "500",
-        color: "#222",
-        marginTop: 4,
-        borderWidth: 1,
-        borderColor: "#ccc",
-        padding: 10,
-        borderRadius: 8,
-        backgroundColor: "#fff",
-    },
-    image: {
-        width: "100%",
-        height: 200,
-        borderRadius: 10,
-        marginTop: 12,
-    },
-    addButton: {
-        marginTop: 12,
-        backgroundColor: "#00796b",
-        padding: 10,
-        borderRadius: 8,
-        alignItems: "center",
-    },
-    addButtonText: {
-        color: "#fff",
-        fontWeight: "bold",
-        fontSize: 14,
-    },
-    saveButton: {
-        marginTop: 24,
-        backgroundColor: "#2E5C4D",
-        padding: 12,
-        borderRadius: 10,
-        alignItems: "center",
-    },
-    saveButtonText: {
-        color: "#fff",
-        fontWeight: "bold",
-        fontSize: 16,
-    },
-    loader: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#fff",
-    },
-    trainAnimation: {
-        width: width,
-        height: 0,
-        position: "absolute",
-        bottom: 0,
-    }, toggleContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginVertical: 10,
-    },
-});
+const getStyles = (theme: string) =>
+    StyleSheet.create({
+        container: {
+
+            backgroundColor: theme === 'dark' ? '#121212' : '#f9f9f9',
+        },
+        scrollContent: {
+            padding: 16,
+            paddingBottom: 300,
+            flexGrow: 1,
+            alignItems: "center",
+        },
+        heading: {
+            fontSize: 28,
+            fontWeight: "bold",
+            marginBottom: 20,
+            color: theme === 'dark' ? "#ffffff" : "#00796b",
+            textAlign: "center",
+        },
+        card: {
+            backgroundColor: theme === 'dark' ? "#1e1e1e" : "rgba(255, 255, 255, 0.9)",
+            borderRadius: 16,
+            padding: 24,
+            width: "100%",
+            maxWidth: 400,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 5 },
+            shadowOpacity: 0.2,
+            shadowRadius: 10,
+            elevation: 8,
+        },
+        label: {
+            fontSize: 14,
+            fontWeight: "600",
+            color: theme === 'dark' ? "#ccc" : "#555",
+            marginTop: 14,
+        },
+        input: {
+            fontSize: 16,
+            fontWeight: "500",
+            color: theme === 'dark' ? "#eee" : "#222",
+            marginTop: 4,
+            borderWidth: 1,
+            borderColor: theme === 'dark' ? "#555" : "#ccc",
+            padding: 10,
+            borderRadius: 8,
+            backgroundColor: theme === 'dark' ? "#2c2c2c" : "#fff",
+        },
+        image: {
+            width: "100%",
+            height: 200,
+            borderRadius: 10,
+            marginTop: 12,
+        },
+        addButton: {
+            marginTop: 12,
+            backgroundColor: "#00796b",
+            padding: 10,
+            borderRadius: 8,
+            alignItems: "center",
+        },
+        addButtonText: {
+            color: "#fff",
+            fontWeight: "bold",
+            fontSize: 14,
+        },
+        saveButton: {
+            marginTop: 24,
+            backgroundColor: "#2E5C4D",
+            padding: 12,
+            borderRadius: 10,
+            alignItems: "center",
+        },
+        saveButtonText: {
+            color: "#fff",
+            fontWeight: "bold",
+            fontSize: 16,
+        },
+        loader: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: theme === 'dark' ? "#000" : "#fff",
+        },
+        trainAnimation: {
+            width: width,
+            height: 0,
+            position: "absolute",
+            bottom: 0,
+        },
+        toggleContainer: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginVertical: 10,
+        },
+        switchRow: {
+            marginTop: 10,
+            marginBottom: 10,
+        },
+        buttonGroup: {
+            flexDirection: "row",
+            justifyContent: "space-around",
+            marginTop: 10,
+        },
+        toggleButton: {
+            paddingVertical: 8,
+            paddingHorizontal: 14,
+            borderWidth: 1,
+            borderColor: theme === 'dark' ? "#666" : "#ccc",
+            borderRadius: 8,
+            backgroundColor: theme === 'dark' ? "#333" : "#f0f0f0",
+            marginHorizontal: 4,
+        },
+        selectedButton: {
+            backgroundColor: "#00796b",
+            borderColor: "#00796b",
+        },
+        toggleButtonText: {
+            fontSize: 14,
+            fontWeight: "600",
+            color: theme === 'dark' ? "#eee" : "#222",
+        },
+    });

@@ -11,6 +11,7 @@ export interface Auth {
     password: string;
     confirmPassword: string;
     languagePreference?: 'en' | 'hi';
+
 }
 
 export type Machine = {

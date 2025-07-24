@@ -21,6 +21,7 @@ export const translations = {
         notAvailable: "Not Available",
         rating: "Rating",
         work: "Work",
+        theme: "Theme",
     },
     hi: {
         welcome: "नमस्ते",
@@ -44,5 +45,6 @@ export const translations = {
         notAvailable: "उपलब्ध नहीं",
         rating: "रेटिंग",
         work: "काम",
+        theme: "थीम",
     }
 };

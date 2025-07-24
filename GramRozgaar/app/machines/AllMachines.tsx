@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+    ScrollView,
+    Image,
+    Linking,
+    TouchableOpacity,
+} from "react-native";
 import { useSelector } from "react-redux";
 import Header from "@/components/Header/Header";
 import FooterBar from "@/components/Header/FooterBar";
@@ -13,11 +21,11 @@ import { API_URL } from "@/services/API";
 import { Machine } from "@/Types/AllTypes";
 import { translations } from "@/src/constants/translation";
 
-
 const AllMachines = () => {
+    const language = useSelector(selectCurrentLanguage);
     const user = useSelector(selectCurrentUser);
     const theme = useSelector(selectCurrentTheme);
-    const language = useSelector(selectCurrentLanguage);
+    const styles = getStyles(theme);
 
     const [machines, setMachines] = useState<Machine[]>([]);
     const t = translations[language];
@@ -41,46 +49,84 @@ const AllMachines = () => {
     return (
         <View style={styles.container}>
             <Header />
-            <Text style={styles.title}>🚜 {t.machineImages}</Text>
 
-            {machines.length === 0 ? (
-                <Text style={styles.noDataText}>{t.noMachinesAvailable || "No machines available"}</Text>
-            ) : (
-                machines.map((machine, index) => (
-                    <View key={index} style={styles.card}>
-                        {machine.user?.profileImage && (
-                            <Image
-                                source={{ uri: `${API_URL}/uploads/${machine.user.profileImage}` }}
-                                style={styles.profileImage}
-                            />
-                        )}
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                <Text style={styles.title}>🚜 {t.machineImages}</Text>
 
-                        <Text style={styles.cardTitle}>{machine.name}</Text>
-                        <Text style={styles.machineType}>
-                            {machine.machineType || t.machineType}
-                        </Text>
-
-                        <Text style={styles.cardText}>📞 {machine.user?.phoneNumber || "N/A"}</Text>
-                        <Text style={styles.cardText}>⭐ {t.rating || "Rating"}: {machine.star || "N/A"}</Text>
-
-                        <Text style={machine.isMachineAvailable ? styles.available : styles.unavailable}>
-                            {machine.isMachineAvailable ? `✅ ${t.available || "Available"}` : `❌ ${t.notAvailable || "Not Available"}`}
-                        </Text>
-
-                        {machine.machineImages && machine.machineImages.length > 0 && (
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageGallery}>
-                                {machine.machineImages.map((img, idx) => (
+                {machines.length === 0 ? (
+                    <Text style={styles.noDataText}>
+                        {t.noMachinesAvailable || "No machines available"}
+                    </Text>
+                ) : (
+                    machines.map((machine, index) => (
+                        <View key={index} style={styles.card}>
+                            <View style={styles.row}>
+                                {machine.user?.profileImage && (
                                     <Image
-                                        key={idx}
-                                        source={{ uri: `${API_URL}/uploads/machineImg/${img}` }}
-                                        style={styles.machineImage}
+                                        source={{
+                                            uri: `${API_URL}/uploads/${machine.user.profileImage}`,
+                                        }}
+                                        style={styles.profileImage}
                                     />
-                                ))}
-                            </ScrollView>
-                        )}
-                    </View>
-                ))
-            )}
+                                )}
+
+                                <View style={styles.cardContent}>
+                                    <Text style={styles.cardTitle}>{machine.name}</Text>
+                                    <Text style={styles.cardText}>
+                                        {machine.machineType || t.machineType}
+                                    </Text>
+
+                                    {machine.user?.phoneNumber ? (
+                                        <TouchableOpacity
+                                            onPress={() =>
+                                                Linking.openURL(`tel:${machine.user?.phoneNumber}`)
+                                            }
+                                        >
+                                            <Text style={[styles.cardText, styles.phoneText]}>
+                                                📞 {machine.user?.phoneNumber}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ) : (
+                                        <Text style={styles.cardText}>📞 N/A</Text>
+                                    )}
+
+                                    <Text style={styles.cardText}>
+                                        ⭐ {t.rating || "Rating"}: {machine.star || "N/A"}
+                                    </Text>
+
+                                    <Text
+                                        style={
+                                            machine.isMachineAvailable
+                                                ? styles.available
+                                                : styles.unavailable
+                                        }
+                                    >
+                                        {machine.isMachineAvailable
+                                            ? `✅ ${t.available || "Available"}`
+                                            : `❌ ${t.notAvailable || "Not Available"}`}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            {machine.machineImages && machine.machineImages.length > 0 && (
+                                <ScrollView
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    style={styles.imageGallery}
+                                >
+                                    {machine.machineImages.map((img, idx) => (
+                                        <Image
+                                            key={idx}
+                                            source={{ uri: `${API_URL}/uploads/machineImg/${img}` }}
+                                            style={styles.machineImage}
+                                        />
+                                    ))}
+                                </ScrollView>
+                            )}
+                        </View>
+                    ))
+                )}
+            </ScrollView>
 
             <FooterBar />
         </View>
@@ -89,83 +135,94 @@ const AllMachines = () => {
 
 export default AllMachines;
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#F0F4F8",
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: "bold",
-        marginVertical: 16,
-        textAlign: "center",
-        color: "#155E75",
-    },
-    scrollContent: {
-        paddingHorizontal: 16,
-        paddingBottom: 100,
-    },
-    card: {
-        backgroundColor: "#fff",
-        padding: 20,
-        marginBottom: 16,
-        borderRadius: 16,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 6,
-        elevation: 5,
-        alignItems: "center",
-    },
-    cardTitle: {
-        fontSize: 20,
-        fontWeight: "bold",
-        marginBottom: 4,
-        color: "#1F2937",
-    },
-    cardText: {
-        fontSize: 14,
-        color: "#4B5563",
-        marginVertical: 2,
-    },
-    machineType: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: "#10B981",
-        marginBottom: 4,
-    },
-    available: {
-        marginTop: 8,
-        color: "#059669",
-        fontWeight: "bold",
-    },
-    unavailable: {
-        marginTop: 8,
-        color: "#DC2626",
-        fontWeight: "bold",
-    },
-    noDataText: {
-        textAlign: "center",
-        fontSize: 16,
-        color: "#6B7280",
-        marginTop: 30,
-    },
-    profileImage: {
-        width: 90,
-        height: 90,
-        borderRadius: 45,
-        marginBottom: 12,
-        borderWidth: 2,
-        borderColor: "#D1D5DB",
-    },
-    imageGallery: {
-        marginTop: 12,
-        width: "100%",
-    },
-    machineImage: {
-        width: 100,
-        height: 80,
-        borderRadius: 10,
-        marginRight: 10,
-    },
-});
+const getStyles = (theme: string) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme === "dark" ? "#111827" : "#e0f7fa",
+        },
+        scrollContent: {
+            padding: 16,
+            paddingBottom: 300,
+            flexGrow: 1,
+            alignItems: "center",
+        },
+        title: {
+            fontSize: 26,
+            fontWeight: "700",
+            color: theme === "dark" ? "#F3F4F6" : "#00796b",
+            textAlign: "center",
+            marginBottom: 16,
+        },
+        card: {
+            backgroundColor: theme === "dark" ? "#1F2937" : "rgba(255, 255, 255, 0.9)",
+            borderRadius: 16,
+            padding: 24,
+            width: "100%",
+            maxWidth: 400,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 5 },
+            shadowOpacity: 0.2,
+            shadowRadius: 10,
+            elevation: 8,
+            alignSelf: "center",
+            marginBottom: 20,
+        },
+        row: {
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 10,
+        },
+        profileImage: {
+            width: 80,
+            height: 80,
+            borderRadius: 40,
+            marginRight: 16,
+            borderWidth: 2,
+            borderColor: "#E5E7EB",
+        },
+        cardContent: {
+            flex: 1,
+        },
+        cardTitle: {
+            fontSize: 18,
+            fontWeight: "700",
+            color: theme === "dark" ? "#F9FAFB" : "#1F2937",
+            marginBottom: 4,
+        },
+        cardText: {
+            fontSize: 14,
+            color: theme === "dark" ? "#D1D5DB" : "#4B5563",
+            marginVertical: 2,
+        },
+        phoneText: {
+            color: "#2563EB",
+            textDecorationLine: "underline",
+        },
+        available: {
+            marginTop: 6,
+            color: "#10B981",
+            fontWeight: "bold",
+        },
+        unavailable: {
+            marginTop: 6,
+            color: "#EF4444",
+            fontWeight: "bold",
+        },
+        imageGallery: {
+            marginTop: 12,
+            paddingLeft: 8,
+        },
+        machineImage: {
+            width: 100,
+            height: 80,
+            borderRadius: 10,
+            marginRight: 10,
+        },
+        noDataText: {
+            textAlign: "center",
+            fontSize: 16,
+            color: theme === "dark" ? "#9CA3AF" : "#6B7280",
+            marginTop: 30,
+        },
+    });
