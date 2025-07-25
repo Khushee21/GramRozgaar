@@ -31,7 +31,7 @@ const FooterBar = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-                onPress={() => router.push("/home/HomeDashboard")}
+                onPress={() => router.push("/home/dashbord")}
                 style={styles.homeIconWrapper}
             >
                 <FontAwesome5 name="home" size={30} color={colorPalette.onPrimary} />

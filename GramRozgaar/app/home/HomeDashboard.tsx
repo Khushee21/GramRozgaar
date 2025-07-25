@@ -1,9 +1,11 @@
 import { View } from "react-native"
+import Header from "@/components/Header/Header";
+import FooterBar from "@/components/Header/FooterBar";
 
 const HomeDashboard = () => {
     return (
         <View>
-            this is home Dashboard
+            <Header></Header>
         </View>
     )
 }

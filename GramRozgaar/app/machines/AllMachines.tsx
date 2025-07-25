@@ -139,7 +139,7 @@ const getStyles = (theme: string) =>
     StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: theme === "dark" ? "#111827" : "#e0f7fa",
+            backgroundColor: theme === "dark" ? "#111827" : "#F3F4F6",
         },
         scrollContent: {
             padding: 16,
