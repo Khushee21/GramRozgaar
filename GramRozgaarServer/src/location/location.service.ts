@@ -12,14 +12,22 @@ export class LocationService {
     ) { }
 
     async updateLocation(userId: number, latitude: number, longitude: number) {
-        const location = await this.prisma.location.upsert({
-            where: { userId },
-            update: { latitude, longitude },
-            create: { userId, latitude, longitude },
-        });
+        try {
+            console.log('hey');
+            const location = await this.prisma.location.upsert({
+                where: { id: userId },
+                update: { latitude, longitude },
+                create: { userId, latitude, longitude },
 
-        await this.locationGateway.broadcastLocationUpdate();
-        return location;
+            });
+
+            console.log("📍Location updated: ", location);
+            await this.locationGateway.broadcastLocationUpdate();
+            return location;
+        } catch (error) {
+            console.error("❌ Error updating location: ", error);
+            throw error;
+        }
     }
 
     async getAllUserLocations() {
