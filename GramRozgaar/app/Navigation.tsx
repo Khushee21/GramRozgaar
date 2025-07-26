@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '@/store/Seletor';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Dashboard from './home/dashbord';
+import Dashboard from './home/history';
 import HomeDashboard from './home/HomeDashboard';
 import AllWorkerPage from './workers/AllWorkers';
 import AllMachines from './machines/AllMachines';

@@ -96,7 +96,7 @@ const Info = () => {
             await AsyncStorage.setItem(`infoDone-${user.phoneNumber}`, 'true');
             Alert.alert('User data submitted', result.message);
             console.log(res);
-            router.push('/home/dashbord');
+            router.push('/home/location');
         } catch (err: any) {
             Alert.alert('data submission error', err.message);
             console.log('Submission error', err);
@@ -193,7 +193,7 @@ const Info = () => {
                 style={styles.skipButton}
                 onPress={() => {
                     //console.log("Skipped!");
-                    router.push('/home/dashbord');
+                    router.push('/home/location');
                 }}
             >
                 <Text style={styles.skipText}>{t.skip}</Text>
