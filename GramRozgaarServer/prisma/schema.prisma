@@ -15,30 +15,42 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  phoneNumber  String   @unique
+  id           Int        @id @default(autoincrement())
+  phoneNumber  String     @unique
   password     String
   age          Int
   village      String
   profileImage String?
   name         String?
-  createdAt    DateTime  @default(now())
+  createdAt    DateTime   @default(now())
   refreshToken String?
   userInfo     UserInfo?
+  locations    Location[]
 }
 
 model UserInfo {
-  id                  String   @id @default(uuid())
-  name                String
-  userId              Int   @unique
-  workType            String
-  isAvailableForWork  Boolean  @default(false)
-  isMachineAvailable  Boolean  @default(false)
-  machineType         String?
-  machineImages       String[]
-  createdAt           DateTime @default(now())
-  machineAlreadySet   Boolean  @default(false)
+  id                 String   @id @default(uuid())
+  name               String
+  userId             Int      @unique
+  workType           String
+  isAvailableForWork Boolean  @default(false)
+  isMachineAvailable Boolean  @default(false)
+  machineType        String?
+  machineImages      String[]
+  createdAt          DateTime @default(now())
+  machineAlreadySet  Boolean  @default(false)
 
   user User @relation(fields: [userId], references: [id])
+
   @@map("userinfo")
+}
+
+model Location {
+  id        Int      @id @default(autoincrement())
+  userId    Int       @unique
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }

@@ -19,7 +19,7 @@ import { LocationModule } from './location/location.module';
     PrismaModule,
     UserModule,
     Worker_machine,
-    LocationModule
+    LocationModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
