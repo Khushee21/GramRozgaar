@@ -6,8 +6,9 @@ import {
     PermissionsAndroid,
     Platform,
     Alert,
+    Text
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Callout } from "react-native-maps";
 import io from "socket.io-client";
 import Header from "@/components/Header/Header";
 import FooterBar from "@/components/Header/FooterBar";
@@ -37,7 +38,6 @@ const LiveLocation = () => {
     const token = user?.token;
     const socketRef = useRef<any>(null);
 
-    // Decode user ID from JWT
     useEffect(() => {
         if (token) {
             try {
@@ -77,7 +77,6 @@ const LiveLocation = () => {
         };
     }, [token]);
 
-    // Request location permission on Android
     useEffect(() => {
         const requestPermission = async () => {
             if (Platform.OS === "android") {
@@ -102,7 +101,6 @@ const LiveLocation = () => {
         requestPermission();
     }, []);
 
-    // Send location periodically
     const sendLiveLocation = async () => {
         if (!userId || !socketRef.current) return;
 
@@ -135,19 +133,19 @@ const LiveLocation = () => {
         return () => clearInterval(interval);
     }, [userId]);
 
-    // Listen for location updates
     useEffect(() => {
         const socket = socketRef.current;
         if (!socket) return;
 
         const listener = (data: LocationData[]) => {
-            console.log("📍 Received locationUpdate:", data);
             setLocations(
                 data.map((loc) => ({
                     userId: loc.userId.toString(),
                     latitude: Number(loc.latitude),
                     longitude: Number(loc.longitude),
                     updatedAt: loc.updatedAt,
+                    name: loc.name,
+                    emoji: loc.emoji || "📍"
                 }))
             );
         };
@@ -180,9 +178,22 @@ const LiveLocation = () => {
                                 latitude: loc.latitude,
                                 longitude: loc.longitude,
                             }}
-                            title={loc.name || `User: ${loc.userId}`}
+                            title={`${loc.emoji || "📍"} ${loc.name || `User: ${loc.userId}`}`}
+
                             description={`Updated at: ${new Date(loc.updatedAt).toLocaleTimeString()}`}
-                        />
+                        >
+                            <View style={styles.emojiMarker}>
+                                <Text style={styles.emojiText}>{loc.emoji || "📍"}</Text>
+                            </View>
+                            <Callout>
+                                <View style={styles.callout}>
+                                    <Text style={styles.calloutTitle}>{loc.name || `User: ${loc.userId}`}</Text>
+                                    <Text style={styles.calloutText}>ID: {loc.userId}</Text>
+                                    <Text style={styles.calloutText}>Updated: {new Date(loc.updatedAt).toLocaleTimeString()}</Text>
+                                </View>
+                            </Callout>
+                        </Marker>
+
                     ))}
                 </MapView>
             </View>
@@ -199,6 +210,34 @@ const styles = StyleSheet.create({
         width: Dimensions.get("window").width,
         height: Dimensions.get("window").height - 160,
     },
+    emojiMarker: {
+        backgroundColor: "white",
+        padding: 5,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    emojiText: {
+        fontSize: 20,
+    },
+    callout: {
+        minWidth: 150,
+        padding: 10,
+        backgroundColor: "white",
+        borderRadius: 10,
+        elevation: 2,
+    },
+    calloutTitle: {
+        fontWeight: "bold",
+        fontSize: 16,
+        marginBottom: 4,
+    },
+    calloutText: {
+        fontSize: 14,
+    },
+
 });
 
 export default LiveLocation;
