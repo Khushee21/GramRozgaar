@@ -26,7 +26,7 @@ export class LocationController {
 
         console.log("📩 Received location update:", { userId, ...body });
         const updated = await this.locationService.updateLocation(userId, body.latitude, body.longitude);
-        this.locationGateway.broadcastLocationUpdate();
+        //this.locationGateway.broadcastLocationUpdate();
         return updated;
     }
 

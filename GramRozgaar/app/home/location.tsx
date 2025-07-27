@@ -1,5 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Dimensions, PermissionsAndroid, Platform, Alert } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import {
+    View,
+    StyleSheet,
+    Dimensions,
+    PermissionsAndroid,
+    Platform,
+    Alert,
+} from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import io from "socket.io-client";
 import Header from "@/components/Header/Header";
@@ -9,28 +16,28 @@ import * as Location from "expo-location";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "@/store/Seletor";
 import { jwtDecode } from "jwt-decode";
-import { socket } from "@/components/auth/Socket";
 
-// Socket server expects userId — we'll use 'sub' from token
 type LocationData = {
     userId: string;
-    lat: number;
-    lng: number;
+    latitude: number;
+    longitude: number;
     updatedAt: string;
+    name?: string;
+    emoji?: string;
 };
 
 interface MyJwtPayload {
-    sub: string | number; // use sub as userId
+    sub: string | number;
 }
 
 const LiveLocation = () => {
     const [locations, setLocations] = useState<LocationData[]>([]);
     const user = useSelector(selectCurrentUser);
     const [userId, setUserId] = useState<string | null>(null);
-    const [socket, setSocket] = useState<any>(null);
     const token = user?.token;
+    const socketRef = useRef<any>(null);
 
-    // ✅ Decode token and use 'sub' as userId
+    // Decode user ID from JWT
     useEffect(() => {
         if (token) {
             try {
@@ -46,34 +53,31 @@ const LiveLocation = () => {
         }
     }, [token]);
 
-    // ✅ Initialize socket connection
+    // Connect to WebSocket
     useEffect(() => {
-        if (!token) return;
+        if (!token || socketRef.current) return;
 
-        const newSocket = io(API_URL, {
+        const socket = io(API_URL, {
             transports: ["websocket"],
             auth: { token },
         });
 
-        newSocket.on("connect", () => {
-            console.log("✅ Connected:", newSocket.id);
+        socketRef.current = socket;
+
+        socket.on("connect", () => {
+            console.log("✅ Connected:", socket.id);
         });
 
-        newSocket.on("disconnect", () => {
+        socket.on("disconnect", () => {
             console.log("❌ Disconnected");
         });
 
-        // Your event handlers...
-
-        setSocket(newSocket);
-
         return () => {
-            newSocket.disconnect(); // ✅ clean up
+            socket.disconnect();
         };
-    }, [token]); // ✅ only re-run when token changes
+    }, [token]);
 
-
-    // ✅ Request location permission for Android
+    // Request location permission on Android
     useEffect(() => {
         const requestPermission = async () => {
             if (Platform.OS === "android") {
@@ -98,9 +102,10 @@ const LiveLocation = () => {
         requestPermission();
     }, []);
 
-    // ✅ Send live location to server
+    // Send location periodically
     const sendLiveLocation = async () => {
-        if (!userId || !socket) return;
+        if (!userId || !socketRef.current) return;
+
         try {
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== "granted") {
@@ -114,7 +119,7 @@ const LiveLocation = () => {
 
             console.log("📡 Location sent:", location.coords);
 
-            socket.emit("location", {
+            socketRef.current.emit("location", {
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
             });
@@ -123,28 +128,35 @@ const LiveLocation = () => {
         }
     };
 
-    // ✅ Interval to send location every 10 seconds
     useEffect(() => {
-        if (!userId || !socket) return;
+        if (!userId || !socketRef.current) return;
 
         const interval = setInterval(sendLiveLocation, 10000);
         return () => clearInterval(interval);
-    }, [userId, socket]);
+    }, [userId]);
 
-    // ✅ Socket listener cleanup
+    // Listen for location updates
     useEffect(() => {
+        const socket = socketRef.current;
         if (!socket) return;
 
         const listener = (data: LocationData[]) => {
-            setLocations(data);
+            console.log("📍 Received locationUpdate:", data);
+            setLocations(
+                data.map((loc) => ({
+                    userId: loc.userId.toString(),
+                    latitude: Number(loc.latitude),
+                    longitude: Number(loc.longitude),
+                    updatedAt: loc.updatedAt,
+                }))
+            );
         };
 
         socket.on("locationUpdate", listener);
-
         return () => {
             socket.off("locationUpdate", listener);
         };
-    }, [socket]);
+    }, []);
 
     if (!userId) return null;
 
@@ -165,10 +177,10 @@ const LiveLocation = () => {
                         <Marker
                             key={loc.userId}
                             coordinate={{
-                                latitude: loc.lat,
-                                longitude: loc.lng,
+                                latitude: loc.latitude,
+                                longitude: loc.longitude,
                             }}
-                            title={`User: ${loc.userId}`}
+                            title={loc.name || `User: ${loc.userId}`}
                             description={`Updated at: ${new Date(loc.updatedAt).toLocaleTimeString()}`}
                         />
                     ))}
