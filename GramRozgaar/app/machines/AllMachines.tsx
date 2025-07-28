@@ -7,6 +7,7 @@ import {
     Image,
     Linking,
     TouchableOpacity,
+    TextInput
 } from "react-native";
 import { useSelector } from "react-redux";
 import Header from "@/components/Header/Header";
@@ -23,10 +24,10 @@ import { translations } from "@/src/constants/translation";
 
 const AllMachines = () => {
     const language = useSelector(selectCurrentLanguage);
-    const user = useSelector(selectCurrentUser);
     const theme = useSelector(selectCurrentTheme);
     const styles = getStyles(theme);
 
+    const [searchQuery, setSearchQuery] = useState("");
     const [machines, setMachines] = useState<Machine[]>([]);
     const t = translations[language];
 
@@ -46,6 +47,13 @@ const AllMachines = () => {
         fetchAllMachines();
     }, []);
 
+    // 🔍 Filter machines by name or userId
+    const filteredMachines = machines.filter((machine) => {
+        const id = machine.userId?.toString() || "";
+        const query = searchQuery.toLowerCase();
+        return id.includes(query);
+    });
+
     return (
         <View style={styles.container}>
             <Header />
@@ -53,12 +61,20 @@ const AllMachines = () => {
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <Text style={styles.title}>🚜 {t.machineImages}</Text>
 
-                {machines.length === 0 ? (
+                <TextInput
+                    style={styles.searchBox}
+                    placeholder="🔍 Search by name or user ID"
+                    placeholderTextColor={theme === "dark" ? "#9CA3AF" : "#6B7280"}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                />
+
+                {filteredMachines.length === 0 ? (
                     <Text style={styles.noDataText}>
                         {t.noMachinesAvailable || "No machines available"}
                     </Text>
                 ) : (
-                    machines.map((machine, index) => (
+                    filteredMachines.map((machine, index) => (
                         <View key={index} style={styles.card}>
                             <View style={styles.row}>
                                 {machine.user?.profileImage && (
@@ -153,6 +169,19 @@ const getStyles = (theme: string) =>
             color: theme === "dark" ? "#F3F4F6" : "#00796b",
             textAlign: "center",
             marginBottom: 16,
+        },
+        searchBox: {
+            width: "100%",
+            maxWidth: 400,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: "#ccc",
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+            fontSize: 16,
+            marginBottom: 16,
+            backgroundColor: theme === "dark" ? "#1F2937" : "#fff",
+            color: theme === "dark" ? "#F3F4F6" : "#000",
         },
         card: {
             backgroundColor: theme === "dark" ? "#1F2937" : "rgba(255, 255, 255, 0.9)",
