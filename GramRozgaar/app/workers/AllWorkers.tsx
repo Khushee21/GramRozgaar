@@ -8,6 +8,7 @@ import {
     ScrollView,
     Linking,
     TouchableOpacity,
+    TextInput,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { authFetch } from "@/services/authFetch";
@@ -23,7 +24,7 @@ import { Worker } from "@/Types/AllTypes";
 
 const AllWorkerPage = () => {
     const [workers, setWorkers] = useState<Worker[]>([]);
-    const user = useSelector(selectCurrentUser);
+    const [searchQuery, setSearchQuery] = useState("");
     const language = useSelector(selectCurrentLanguage);
     const theme = useSelector(selectCurrentTheme);
     const t = translations[language];
@@ -44,16 +45,32 @@ const AllWorkerPage = () => {
         fetchAllWorker();
     }, []);
 
+    const filteredWorkers = workers.filter((worker) => {
+        const name = worker.name?.toLowerCase() || "";
+        const id = worker.userId?.toString() || "";
+        const query = searchQuery.toLowerCase();
+        return name.includes(query) || id.includes(query);
+    });
+
     return (
         <View style={styles.container}>
             <Header />
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <Text style={styles.heading}>👷 {"All Workers"}</Text>
 
-                {workers.length === 0 ? (
-                    <Text style={styles.noDataText}>🚫 {"No workers available"}</Text>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <Text style={styles.heading}>👷 All Workers</Text>
+
+                <TextInput
+                    style={styles.searchBox}
+                    placeholder="🔍 Search by name or user ID"
+                    placeholderTextColor={theme === "dark" ? "#9CA3AF" : "#6B7280"}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                />
+
+                {filteredWorkers.length === 0 ? (
+                    <Text style={styles.noDataText}>🚫 No workers available</Text>
                 ) : (
-                    workers.map((worker, index) => (
+                    filteredWorkers.map((worker, index) => (
                         <View key={index} style={styles.card}>
                             <View style={styles.row}>
                                 {worker.user?.profileImage && (
@@ -93,6 +110,7 @@ const AllWorkerPage = () => {
                     ))
                 )}
             </ScrollView>
+
             <FooterBar />
         </View>
     );
@@ -100,7 +118,6 @@ const AllWorkerPage = () => {
 
 export default AllWorkerPage;
 
-// Theme-aware styling
 const getStyles = (theme: string) =>
     StyleSheet.create({
         container: {
@@ -117,6 +134,18 @@ const getStyles = (theme: string) =>
             color: theme === "dark" ? "#F3F4F6" : "#1F2937",
             textAlign: "center",
             marginVertical: 20,
+        },
+        searchBox: {
+            width: "100%",
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: "#ccc",
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+            fontSize: 16,
+            marginBottom: 20,
+            backgroundColor: theme === "dark" ? "#1F2937" : "#fff",
+            color: theme === "dark" ? "#F3F4F6" : "#000",
         },
         card: {
             backgroundColor: theme === "dark" ? "#1F2937" : "#ffffff",
