@@ -71,6 +71,21 @@ export class LocationGateway
 
     async broadcastLocationUpdate() {
         const locations = await this.locationService.getAllUserLocations();
-        this.server.emit('locationUpdate', locations);
+
+        const enrichedLocations = locations.map((loc) => ({
+            userId: loc.userId,
+            latitude: loc.latitude,
+            longitude: loc.longitude,
+            updatedAt: loc.createdAt,
+            emoji: "📍",
+            user: {
+                name: loc.user?.name || "Unknown",
+                profileImage: loc.user?.profileImage || null,
+            }
+        }));
+
+
+        this.server.emit('locationUpdate', enrichedLocations);
     }
+
 }

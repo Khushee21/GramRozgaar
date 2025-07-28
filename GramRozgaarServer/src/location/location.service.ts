@@ -30,12 +30,19 @@ export class LocationService {
         }
     }
 
+
     async getAllUserLocations() {
         return this.prisma.location.findMany({
-            include: { user: true },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        profileImage: true,
+                    },
+                },
+            },
         });
     }
-
     async getLocationByUserId(userId: number) {
         return this.prisma.location.findUnique({
             where: { userId },

@@ -6,7 +6,8 @@ import {
     PermissionsAndroid,
     Platform,
     Alert,
-    Text
+    Text,
+    Image
 } from "react-native";
 import MapView, { Marker, Callout } from "react-native-maps";
 import io from "socket.io-client";
@@ -23,8 +24,11 @@ type LocationData = {
     latitude: number;
     longitude: number;
     updatedAt: string;
-    name?: string;
     emoji?: string;
+    user?: {
+        name?: string;
+        profileImage?: string;
+    };
 };
 
 interface MyJwtPayload {
@@ -45,7 +49,7 @@ const LiveLocation = () => {
                 if (decoded?.sub) {
                     setUserId(decoded.sub.toString());
                 } else {
-                    console.warn("sub (userId) not found in token payload");
+                    // console.warn("sub (userId) not found in token payload");
                 }
             } catch (error) {
                 console.error("Invalid token:", error);
@@ -53,7 +57,6 @@ const LiveLocation = () => {
         }
     }, [token]);
 
-    // Connect to WebSocket
     useEffect(() => {
         if (!token || socketRef.current) return;
 
@@ -65,11 +68,11 @@ const LiveLocation = () => {
         socketRef.current = socket;
 
         socket.on("connect", () => {
-            console.log("✅ Connected:", socket.id);
+            //console.log("✅ Connected:", socket.id);
         });
 
         socket.on("disconnect", () => {
-            console.log("❌ Disconnected");
+            // console.log("❌ Disconnected");
         });
 
         return () => {
@@ -93,7 +96,7 @@ const LiveLocation = () => {
                         Alert.alert("Permission Denied", "Location permission is required.");
                     }
                 } catch (err) {
-                    console.warn("Permission error:", err);
+                    //  console.warn("Permission error:", err);
                 }
             }
         };
@@ -115,7 +118,7 @@ const LiveLocation = () => {
                 accuracy: Location.Accuracy.High,
             });
 
-            console.log("📡 Location sent:", location.coords);
+            // console.log("📡 Location sent:", location.coords);
 
             socketRef.current.emit("location", {
                 latitude: location.coords.latitude,
@@ -138,13 +141,20 @@ const LiveLocation = () => {
         if (!socket) return;
 
         const listener = (data: LocationData[]) => {
+            //  console.log("📥 Live location update received:");
+            // data.forEach((loc, i) => {
+            //     console.log(
+            //         `#${i + 1} 👤 User: ${loc.user?.name || loc.userId} | 🧭 (${loc.latitude}, ${loc.longitude}) | 🕒 ${new Date(loc.updatedAt).toLocaleString()}`
+            //     );
+            // });
+
             setLocations(
                 data.map((loc) => ({
                     userId: loc.userId.toString(),
                     latitude: Number(loc.latitude),
                     longitude: Number(loc.longitude),
                     updatedAt: loc.updatedAt,
-                    name: loc.name,
+                    name: loc.user?.name,
                     emoji: loc.emoji || "📍"
                 }))
             );
@@ -178,16 +188,28 @@ const LiveLocation = () => {
                                 latitude: loc.latitude,
                                 longitude: loc.longitude,
                             }}
-                            title={`${loc.emoji || "📍"} ${loc.name || `User: ${loc.userId}`}`}
+                            title={`${loc.emoji || "📍"} ${loc.user?.name || `User: ${loc.userId}`}`}
 
-                            description={`Updated at: ${new Date(loc.updatedAt).toLocaleTimeString()}`}
+                            description={`Updated at: ${isNaN(new Date(loc.updatedAt).getTime())
+                                ? "Not available"
+                                : new Date(loc.updatedAt).toLocaleTimeString()
+                                }`}
+
                         >
-                            <View style={styles.emojiMarker}>
-                                <Text style={styles.emojiText}>{loc.emoji || "📍"}</Text>
-                            </View>
+                            {loc.user?.profileImage ? (
+                                <Image
+                                    source={{ uri: loc.user?.profileImage }}
+                                    style={styles.avatar}
+                                />
+                            ) : (
+                                <View style={styles.emojiMarker}>
+                                    <Text style={styles.emojiText}>📍{loc.userId || "📍"}</Text>
+                                </View>
+                            )}
+
                             <Callout>
                                 <View style={styles.callout}>
-                                    <Text style={styles.calloutTitle}>{loc.name || `User: ${loc.userId}`}</Text>
+                                    <Text style={styles.calloutTitle}>{loc.user?.name || `User: ${loc.userId}`}</Text>
                                     <Text style={styles.calloutText}>ID: {loc.userId}</Text>
                                     <Text style={styles.calloutText}>Updated: {new Date(loc.updatedAt).toLocaleTimeString()}</Text>
                                 </View>
@@ -220,7 +242,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     emojiText: {
-        fontSize: 20,
+        fontSize: 14,
     },
     callout: {
         minWidth: 150,
@@ -237,6 +259,14 @@ const styles = StyleSheet.create({
     calloutText: {
         fontSize: 14,
     },
+    avatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        borderWidth: 2,
+        borderColor: "#007AFF",
+    },
+
 
 });
 
