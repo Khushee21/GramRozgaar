@@ -39,7 +39,7 @@ const AllWorkerPage = () => {
                 const data = await res.json();
                 setWorkers(data);
             } catch (err: any) {
-                console.log("Error fetching workers:", err);
+                //console.log("Error fetching workers:", err);
             }
         };
         fetchAllWorker();

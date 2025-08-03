@@ -95,11 +95,11 @@ const Info = () => {
             const result = await res.json();
             await AsyncStorage.setItem(`infoDone-${user.phoneNumber}`, 'true');
             Alert.alert('User data submitted', result.message);
-            console.log(res);
+            //console.log(res);
             router.push('/home/location');
         } catch (err: any) {
             Alert.alert('data submission error', err.message);
-            console.log('Submission error', err);
+            //console.log('Submission error', err);
         }
 
         // console.log("Submit info:", {

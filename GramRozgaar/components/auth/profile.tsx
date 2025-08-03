@@ -65,10 +65,10 @@ const Profile = () => {
     useEffect(() => {
         const fetchUserInfo = async () => {
             if (!user) return;
-            console.log(user);
+            // console.log(user);
             try {
                 const res = await authFetch(`${API_URL}/users/user-profile`);
-                console.log(res.json);
+                // console.log(res.json);
                 if (!res.ok) throw new Error("Failed to fetch user info");
 
                 const data = await res.json();
@@ -83,7 +83,7 @@ const Profile = () => {
                 setWork(profile?.workType || '');
                 setMachine(profile?.machineType || '');
             } catch (error) {
-                console.error("Error fetching userInfo:", error);
+                // console.error("Error fetching userInfo:", error);
             } finally {
                 setLoading(false);
             }
@@ -122,7 +122,7 @@ const Profile = () => {
             if (!res.ok) throw new Error("Update failed");
             Alert.alert("✅ Success", "Profile updated successfully.");
         } catch (err) {
-            console.error(err);
+            // console.error(err);
             Alert.alert("❌ Error", "Failed to update profile.");
         }
     };

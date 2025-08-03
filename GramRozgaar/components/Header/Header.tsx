@@ -43,7 +43,7 @@ const Header = () => {
                 const data = await res.json();
                 setProfileIcon(`${API_URL}/uploads/${data.profileImage}`);
             } catch (err) {
-                console.error("Image fetch error:", err);
+                // console.error("Image fetch error:", err);
             }
         };
 

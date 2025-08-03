@@ -40,7 +40,7 @@ const AllMachines = () => {
                 const data = await res.json();
                 setMachines(data);
             } catch (err: any) {
-                console.log("Error fetching machines:", err);
+                //console.log("Error fetching machines:", err);
             }
         };
 

@@ -20,11 +20,11 @@ export class LocationController {
     async updateLocation(@Req() req: RequestWithUser, @Body() body: { latitude: number, longitude: number }) {
         const userId = req.user['userId'];
         if (!userId) {
-            console.error("❌ No userId in token");
+
             throw new UnauthorizedException("Invalid token payload");
         }
 
-        console.log("📩 Received location update:", { userId, ...body });
+
         const updated = await this.locationService.updateLocation(userId, body.latitude, body.longitude);
         //this.locationGateway.broadcastLocationUpdate();
         return updated;

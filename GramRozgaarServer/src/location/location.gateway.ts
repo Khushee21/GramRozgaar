@@ -39,31 +39,31 @@ export class LocationGateway
                 socket.data.user = decoded;
                 return next();
             } catch (err) {
-                console.error('❌ Token verification failed:', err.message);
+
                 return next(new UnauthorizedException('Invalid token'));
             }
         });
     }
 
     handleConnection(socket: Socket) {
-        console.log('✅ Client connected:', socket.id, 'User:', socket.data.user?.sub);
+        // console.log('✅ Client connected:', socket.id, 'User:', socket.data.user?.sub);
     }
 
     handleDisconnect(socket: Socket) {
-        console.log('❌ Client disconnected:', socket.id);
+        // console.log('❌ Client disconnected:', socket.id);
     }
 
     @SubscribeMessage('location')
     async handleLocation(@MessageBody() data: any, @ConnectedSocket() socket: Socket) {
         const user = socket.data.user;
         if (!user || !user.sub) {
-            console.error('❌ No user found in socket');
+
             return;
         }
 
         const { latitude, longitude } = data;
 
-        console.log(`📍 Received location from user ${user.sub}:`, latitude, longitude);
+
 
         await this.locationService.updateLocation(user.sub, latitude, longitude);
         this.broadcastLocationUpdate();

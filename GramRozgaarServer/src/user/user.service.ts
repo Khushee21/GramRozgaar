@@ -27,7 +27,7 @@ export class UserService {
             if (password !== confirmPassword) {
                 throw new BadRequestException('Passwords do not match.');
             }
-            console.log('again signup data:', data);
+
             const hashedPassword = await bcrypt.hash(password, 10);
             let user;
             try {
